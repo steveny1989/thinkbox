@@ -4,10 +4,6 @@
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     
-    // 加载环境变量
-    import dotenv from 'dotenv';
-    dotenv.config();
-
     // Firebase 配置
     const firebaseConfig = {
       apiKey: "AIzaSyCUEVjMFHilowCjviJSJ8aeWGItRSSvdbY",
