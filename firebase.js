@@ -10,12 +10,12 @@
 
     // Firebase 配置
     const firebaseConfig = {
-      apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_FIREBASE_APP_ID
+      apiKey: "AIzaSyCUEVjMFHilowCjviJSJ8aeWGItRSSvdbY",
+      authDomain: "cool-citadel-427909-s2.firebaseapp.com",
+      projectId: "cool-citadel-427909-s2",
+      storageBucket: "cool-citadel-427909-s2.appspot.com",
+      messagingSenderId: "307634775595",
+      appId: "1:307634775595:web:c9d1e96d238eede3736c6e"
     };
     
           
