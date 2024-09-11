@@ -1,13 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notes App</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Hello World from GitHub Pages!</h1>
-  <script src="scripts.js"></script>
+    <div class="container">
+        <button id="logoutButton">登出</button>
+        <div class="textarea-container">
+            <textarea id="noteContent" placeholder="在这里输入你的笔记..."></textarea>
+            <button id="addNoteButton">+</button> <!-- 小的圆润按钮 -->
+        </div>
+        <input type="text" id="searchInput" placeholder="搜索笔记..." oninput="searchNotes()"> <!-- 搜索框 -->
+        <ul id="noteList">
+            <!-- 笔记列表项 -->
+        </ul>
+    </div>
+    <script type="module" src="./script.js"></script>
 </body>
 </html>
