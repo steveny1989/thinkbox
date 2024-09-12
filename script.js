@@ -30,18 +30,20 @@ async function addNote() {
   if (noteInput) {
     try {
       const response = await fetch(`${API_URL}/notes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: noteInput, timestamp })
+        // ... (其他设置)
       });
+
+      if (!response.ok) { // 检查服务器响应状态码
+        throw new Error(`Failed to add note: ${response.status} ${response.statusText}`);
+      }
       const newNote = await response.json();
       notes.push(newNote);
       document.getElementById('noteInput').value = '';
       updateNoteList();
+      // 添加成功反馈信息，例如：alert('笔记添加成功！');
     } catch (error) {
       console.error('Error adding note:', error);
+      // 显示错误信息给用户，例如：alert('添加笔记失败，请稍后重试。');
     }
   } else {
     alert('笔记内容不能为空！');
