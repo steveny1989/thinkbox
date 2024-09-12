@@ -4,7 +4,7 @@ let notes = [];
 
 async function loadNotes() {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 增加超时时间到 10 秒
 
   try {
     const response = await fetch(`${API_URL}/notes`, { signal: controller.signal });
