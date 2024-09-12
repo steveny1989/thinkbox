@@ -1,8 +1,5 @@
 const API_URL = 'https://178.128.81.19:3001';
 
-// 引入 moment.js
-import moment from 'moment';
-
 let notes = [];
 
 async function loadNotes() {
@@ -30,7 +27,7 @@ async function loadNotes() {
 
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value;
-  const timestamp = moment().format('YYYY-MM-DD HH:mm:ss'); // 使用 moment.js 格式化时间戳
+  const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
 
   if (noteInput) {
     try {
