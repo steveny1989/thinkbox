@@ -30,7 +30,11 @@ async function addNote() {
   if (noteInput) {
     try {
       const response = await fetch(`${API_URL}/notes`, {
-        // ... (其他设置)
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: noteInput, timestamp })
       });
 
       if (!response.ok) { // 检查服务器响应状态码
