@@ -27,7 +27,7 @@ async function loadNotes() {
 
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value;
-  const timestamp = new Date().toISOString().slice(0, 23) + 'Z';
+  const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
 
   if (noteInput) {
     try {
