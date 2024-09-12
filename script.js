@@ -1,4 +1,4 @@
-const API_URL = 'http://178.128.81.19:3001'; // 确保使用 HTTP 而不是 HTTPS
+const API_URL = 'https://178.128.81.19:3001'; 
 
 let notes = [];
 
