@@ -1,4 +1,4 @@
-const API_URL = 'https://178.128.81.19:3000';
+const API_URL = 'https://178.128.81.19:3001';
 
 let notes = [];
 
@@ -12,8 +12,8 @@ async function loadNotes() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    notes = await response.json();
-    updateNoteList();
+    const notes = await response.json();
+    updateNoteList(notes);
   } catch (error) {
     if (error.name === 'AbortError') {
       console.error('Error loading notes: Request timed out');
@@ -89,13 +89,13 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
     dropdown.className = 'dropdown';
 
     const dropdownButton = document.createElement('button');
-    dropdownButton.textContent = '...';
+    dropdownButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>'; // 使用 Font Awesome 图标
 
     const dropdownContent = document.createElement('div');
     dropdownContent.className = 'dropdown-content';
 
     const deleteLink = document.createElement('a');
-    deleteLink.textContent = '删除';
+    deleteLink.innerHTML = '<i class="fas fa-trash-alt"></i> 删除'; // 使用 Font Awesome 图标
     deleteLink.href = '#';
     deleteLink.onclick = (event) => {
       event.preventDefault();
@@ -129,9 +129,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   const searchInput = document.getElementById('searchInput');
 
   if (addNoteButton) {
-    addNoteButton.addEventListener('click', () => {
-      // 添加笔记的逻辑
-    });
+    addNoteButton.addEventListener('click', addNote); // 添加笔记的逻辑
   }
 
   if (noteInput) {
@@ -141,9 +139,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   }
 
   if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      // 搜索笔记的逻辑
-    });
+    searchInput.addEventListener('input', searchNotes); // 搜索笔记的逻辑
   }
 });
 
