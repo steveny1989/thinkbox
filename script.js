@@ -27,7 +27,7 @@ async function loadNotes() {
 
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value;
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toISOString().slice(0, 23) + 'Z';
 
   if (noteInput) {
     try {
