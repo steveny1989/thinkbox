@@ -1,4 +1,4 @@
-const API_URL = 'http://178.128.81.19:3001';
+const API_URL = 'http://178.128.81.19:3001'; // 确保使用 HTTP 而不是 HTTPS
 
 let notes = [];
 
@@ -12,7 +12,9 @@ async function loadNotes() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const notes = await response.json();
+    const notesData = await response.json();
+    console.log('Loaded notes:', notesData); // 添加调试信息
+    notes = notesData;
     updateNoteList(notes);
   } catch (error) {
     if (error.name === 'AbortError') {
