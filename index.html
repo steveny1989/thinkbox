@@ -4,31 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Notes App</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <button id="logoutButton">登出</button>
-        <div class="textarea-container">
-            <textarea id="noteContent" placeholder="在这里输入你的笔记..."></textarea>
-            <button id="addNoteButton">+</button> <!-- 小的圆润按钮 -->
-        </div>
-        <input type="text" id="searchInput" placeholder="搜索笔记..." oninput="searchNotes()"> <!-- 搜索框 -->
-        <ul id="noteList">
-            <!-- 笔记列表项 -->
-        </ul>
+        <input type="text" id="noteInput" placeholder="输入笔记内容">
+        <button id="addNoteButton">添加笔记</button>
+        <input type="text" id="searchInput" placeholder="搜索笔记">
+        <ul id="noteList"></ul>
     </div>
-    <script type="module">
-        import { auth, onAuthStateChanged } from './firebase.js';
-
-        // 检查用户认证状态
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                // 如果用户未登录，重定向到 auth.html
-                window.location.href = "auth.html";
-            }
-        });
-    </script>
-    <script type="module" src="scripts.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
