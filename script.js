@@ -123,7 +123,28 @@ function highlightText(text, searchInput) {
   return text.replace(regex, '<span class="highlight">$1</span>');
 }
 
-document.getElementById('addNoteButton').addEventListener('click', addNote);
-document.getElementById('searchInput').addEventListener('input', searchNotes);
+document.addEventListener('DOMContentLoaded', (event) => {
+  const addNoteButton = document.getElementById('addNoteButton');
+  const noteInput = document.getElementById('noteInput');
+  const searchInput = document.getElementById('searchInput');
+
+  if (addNoteButton) {
+    addNoteButton.addEventListener('click', () => {
+      // 添加笔记的逻辑
+    });
+  }
+
+  if (noteInput) {
+    noteInput.addEventListener('input', () => {
+      // 输入笔记的逻辑
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      // 搜索笔记的逻辑
+    });
+  }
+});
 
 loadNotes();
