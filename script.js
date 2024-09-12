@@ -1,4 +1,4 @@
-const API_URL = 'http://178.128.81.19:3000';
+const API_URL = 'https://178.128.81.19:3000';
 
 let notes = [];
 
