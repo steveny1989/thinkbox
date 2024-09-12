@@ -3,12 +3,23 @@ const API_URL = 'https://178.128.81.19:3000';
 let notes = [];
 
 async function loadNotes() {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+
   try {
-    const response = await fetch(`${API_URL}/notes`);
+    const response = await fetch(`${API_URL}/notes`, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     notes = await response.json();
     updateNoteList();
   } catch (error) {
-    console.error('Error loading notes:', error);
+    if (error.name === 'AbortError') {
+      console.error('Error loading notes: Request timed out');
+    } else {
+      console.error('Error loading notes:', error);
+    }
   }
 }
 

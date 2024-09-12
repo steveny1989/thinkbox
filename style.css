@@ -25,23 +25,24 @@ h1 {
   position: relative; /* 为绝对定位的按钮提供参考 */
 }
 
-textarea {
+
+textarea#noteInput {
   width: 100%;
-  height: 100px; /* 100px */
-  margin-bottom: 10px; /* 10px */
-  padding: 10px; /* 10px */
-  border: 1px solid #ccc; /* 1px */
-  border-radius: 5px; /* 5px */
-  font-size: 16px; /* 16px */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  background-color: #f9f9f9; /* 设置背景色 */
-  box-sizing: border-box; /* 确保内边距和边框包含在元素的总宽度和高度内 */
-  transition: background-color 0.3s; /* 添加过渡效果 */
+  height: 100px; /* 你可以根据需要调整高度 */
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+  transition: background-color 0.3s;
 }
 
-textarea:hover {
-  background-color: #cce4ff; /* 悬停时变成较浅的蓝色 */
-  color: black; /* 保持文本颜色为黑色以确保可读性 */
+textarea#noteInput:hover {
+  background-color: #cce4ff;
+  color: black;
 }
 
 button {
@@ -49,24 +50,21 @@ button {
   background-color: #007BFF; /* 蓝色 */
   color: white;
   border: none;
-  border-radius: 50%; /* 圆形按钮 */
-  width: 40px; /* 按钮宽度 */
+  border-radius: 5px; /* 修改为圆角 */
+  width: 100px; /* 按钮宽度 */
   height: 40px; /* 按钮高度 */
-  font-size: 24px; /* 24px */
+  font-size: 16px; /* 16px */
   cursor: pointer;
-  position: absolute;
-  right: 10px; /* 距离右边20px */
-  bottom: 20px; /* 距离底部30px */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  transition: background-color 0.3s; /* 添加过渡效果 */
-  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+  transition: background-color 0.3s, transform 0.2s; /* 添加过渡效果 */
 }
 
 button:hover {
   background-color: #0056b3; /* 深蓝色 */
+  transform: scale(1.05); /* 悬停时放大 */
 }
 
 ul {
