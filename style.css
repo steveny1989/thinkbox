@@ -124,14 +124,7 @@ li {
   padding: 0; /* 移除内边距 */
   margin: 0; /* 移除外边距 */
   transition: color 0.3s; /* 添加过渡效果 */
-  position:absolute;
-  right: 10px;
-  top:50%;
-  transform: translateY(-50%);
-}
-
-.dropdown button:hover {
-  color: #0056b3; /* 深蓝色 */
+  margin-left: 10px; /* 增加按钮和时间戳之间的间距 */
 }
 
 .dropdown-content {
