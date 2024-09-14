@@ -19,6 +19,8 @@ async function logoutUser() {
 
 // 函数：调用 Hugging Face API 获取反馈
 async function getFeedback(noteInput) {
+  console.log('Calling Hugging Face API with input:', noteInput); // 调试日志
+
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {
@@ -31,10 +33,12 @@ async function getFeedback(noteInput) {
   });
 
   if (!response.ok) {
+    console.error('Hugging Face API response error:', response.status); // 调试日志
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
   const data = await response.json();
+  console.log('Hugging Face API response data:', data); // 调试日志
   return data[0]?.generated_text || 'No feedback available';
 }
 
