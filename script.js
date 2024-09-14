@@ -97,7 +97,10 @@ async function addNote() {
       newNote.innerHTML = `
         <div class="note-content">
           <span>${noteInput}</span>
-          <span class="timestamp">${formatTimestamp(timestamp)}</span>
+          <div class="timestamp-container">
+            <span class="timestamp">${formatTimestamp(timestamp)}</span>
+          </div>
+          <div class="feedback-container"></div>
         </div>
       `;
       document.getElementById('noteList').appendChild(newNote);
@@ -105,24 +108,9 @@ async function addNote() {
       // 获取反馈
       const feedback = await getFeedback(noteInput);
 
-      // 创建新的反馈项
-      const feedbackItem = document.createElement('div');
-      feedbackItem.className = 'feedback-item';
-      feedbackItem.innerHTML = `
-        <p>ThinkBox: ${feedback}</p>
-      `;
-
-      // 获取或创建反馈容器
-      let feedbackContainer = document.getElementById('feedbackContainer');
-      if (!feedbackContainer) {
-        feedbackContainer = document.createElement('div');
-        feedbackContainer.id = 'feedbackContainer';
-        feedbackContainer.className = 'feedback-container';
-        document.body.appendChild(feedbackContainer);
-      }
-
-      // 将反馈项添加到反馈容器
-      feedbackContainer.appendChild(feedbackItem);
+      // 添加反馈到笔记项
+      const feedbackContainer = newNote.querySelector('.feedback-container');
+      feedbackContainer.innerHTML = `<p>ThinkBox: ${feedback}</p>`;
 
       document.getElementById('noteInput').value = '';
     } catch (error) {
@@ -162,6 +150,24 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
 
   filteredNotes.forEach((note, index) => {
     const li = document.createElement('li'); // 创建列表项
+
+    li.innerHTML = `
+      <div class="note-content">
+        <span>${highlightText(note.text, searchInput)}</span>
+        <div class="timestamp-container">
+          <span class="timestamp">${formatTimestamp(note.timestamp)}</span>
+          <div class="dropdown">
+            <button class="small-button"></button>
+            <div class="dropdown-content">
+              <a href="#" onclick="event.preventDefault(); deleteNote(${index});"><i class="fas fa-trash-alt"></i> 删除</a>
+            </div>
+          </div>
+        </div>
+        <div class="feedback-container">
+          ${note.feedback ? `<p class="feedback">Feedback: ${note.feedback}</p>` : ''}
+        </div>
+      </div>
+    `;
 
     const noteContent = document.createElement('div'); // 创建笔记内容容器
     noteContent.className = 'note-content';
