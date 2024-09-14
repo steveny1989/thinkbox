@@ -13,13 +13,14 @@ let feedbacks = {};
 // API 调用函数
 const api = {
   async getNotes() {
+    console.log('getNotes called');
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('No user logged in');
+      return []; // 返回空数组
+    }
+    console.log('Getting ID token for user:', user.uid);
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        console.log('No user logged in');
-        throw new Error('No user logged in');
-      }
-      console.log('Getting ID token for user:', user.uid);
       const idToken = await user.getIdToken();
       console.log('ID token obtained, making API call');
       const response = await fetch(`${BASE_API_URL}/notes`, {
@@ -28,29 +29,25 @@ const api = {
         }
       });
       console.log('API response status:', response.status);
-      console.log('API response headers:', response.headers);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API error response:', errorText);
-        throw new Error(`Failed to fetch notes: ${response.status} ${response.statusText}`);
+        console.error('API error:', errorText);
+        throw new Error(`Failed to fetch notes: ${response.statusText}`);
       }
-      
       const data = await response.json();
       console.log('Notes data received:', data);
-      return data;
+      return data; // 这可能是空数组，但不应该导致错误
     } catch (error) {
       console.error('Error in getNotes:', error);
-      if (error instanceof TypeError) {
-        console.error('Network error: ', error.message);
-      }
       throw error;
     }
   },
 
   async addNote(note) {
+    console.log('API addNote called with:', note);
     const user = auth.currentUser;
     if (!user) {
+      console.error('No user logged in');
       throw new Error('No user logged in');
     }
     const idToken = await user.getIdToken();
@@ -62,7 +59,12 @@ const api = {
       },
       body: JSON.stringify(note)
     });
-    if (!response.ok) throw new Error('Failed to add note');
+    console.log('API response status:', response.status);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      throw new Error('Failed to add note');
+    }
     return response.json();
   },
 
@@ -89,29 +91,30 @@ const api = {
 // 笔记操作函数
 const noteOperations = {
   async loadNotes() {
+    console.log('loadNotes called');
     try {
-      console.log('Loading notes...');
+      console.log('Checking auth state...');
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user logged in, skipping note loading');
+        updateNoteList([]); // 更新UI以显示未登录状态
+        return;
+      }
+      console.log('User logged in, fetching notes...');
       const notes = await api.getNotes();
       console.log('Notes loaded successfully:', notes);
-      if (notes.length === 0) {
-        console.log('No notes found or user not logged in');
-      }
       updateNoteList(notes);
     } catch (error) {
       console.error('Error loading notes:', error);
-      if (error.message.includes('Failed to fetch')) {
-        alert('Network error. Please check your internet connection and try again.');
-      } else {
-        alert('Failed to load notes. Please try again later.');
-      }
+      alert('Failed to load notes. Please try again later.');
     }
   },
 
   async addNote(text) {
+    console.log('addNote called with text:', text);
     try {
-      const feedback = await api.getFeedback(text);
       const newNote = await api.addNote({ text, timestamp: new Date().toISOString() });
-      feedbacks[newNote.id] = feedback;
+      console.log('New note added:', newNote);
       notes.unshift(newNote);
       updateNoteList();
       return newNote;
@@ -135,8 +138,27 @@ const noteOperations = {
 };
 
 // UI 更新函数
-function updateNoteList() {
+function updateNoteList(notes) {
+  console.log('updateNoteList called with:', notes);
   const noteList = document.getElementById('noteList');
+  const userEmailElement = document.getElementById('userEmail');
+
+  if (!auth.currentUser) {
+    console.log('No user logged in, updating UI accordingly');
+    userEmailElement.textContent = 'Not logged in';
+    noteList.innerHTML = '<li>Please log in to view your notes.</li>';
+    return;
+  }
+
+  userEmailElement.textContent = auth.currentUser.email;
+
+  if (notes.length === 0) {
+    console.log('No notes found, displaying empty state');
+    noteList.innerHTML = '<li>No notes found. Create your first note!</li>';
+    return;
+  }
+
+  console.log('Updating note list with received notes');
   noteList.innerHTML = notes.map(note => `
     <li>
       <div class="note-content">
@@ -167,6 +189,7 @@ function formatTimestamp(timestamp) {
 
 // 事件监听器
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOMContentLoaded event fired');
   // 获取元素
   const noteInput = document.getElementById('noteInput');
   const addNoteButton = document.getElementById('addNoteButton');
@@ -178,8 +201,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // 添加笔记按钮事件监听器
   if (addNoteButton) {
     addNoteButton.addEventListener('click', function() {
-      // 添加笔记的逻辑
+      const noteText = noteInput.value.trim();
+      if (noteText) {
+        noteOperations.addNote(noteText).then(() => {
+          noteInput.value = ''; // 清空输入框
+        });
+      }
     });
+  } else {
+    console.error('Add Note button not found');
   }
 
   // 搜索输入事件监听器
@@ -196,29 +226,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // 加载笔记
-  loadNotes().then(() => {
-    console.log('Notes loading process completed');
+  // 监听认证状态变化
+  onAuthStateChanged(auth, (user) => {
+    console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+    if (user) {
+      loadNotes().then(() => {
+        console.log('Notes loading process completed');
+      }).catch(error => {
+        console.error('Error in loadNotes:', error);
+      });
+    } else {
+      updateNoteList([]); // 用户登出时清空笔记列表
+    }
   });
 });
 
 // 定义 loadNotes 函数
 async function loadNotes() {
+  console.log('loadNotes called');
   try {
-    console.log('Loading notes...');
+    console.log('Checking auth state...');
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('No user logged in, skipping note loading');
+      updateNoteList([]); // 更新UI以显示未登录状态
+      return;
+    }
+    console.log('User logged in, fetching notes...');
     const notes = await api.getNotes();
     console.log('Notes loaded successfully:', notes);
-    if (notes.length === 0) {
-      console.log('No notes found or user not logged in');
-    }
     updateNoteList(notes);
   } catch (error) {
     console.error('Error loading notes:', error);
-    if (error.message.includes('Failed to fetch')) {
-      alert('Network error. Please check your internet connection and try again.');
-    } else {
-      alert('Failed to load notes. Please try again later.');
-    }
+    alert('Failed to load notes. Please try again later.');
   }
 }
 
