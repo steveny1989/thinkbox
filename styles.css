@@ -114,28 +114,23 @@ ul {
 }
 
 li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff; /* 笔记列表项的背景色 */
-  margin-bottom: 10px; /* 10px */
-  padding: 10px; /* 10px */
-  border: 1px solid #ccc; /* 1px */
-  border-radius: 5px; /* 5px */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  background-color: #fff;
+  margin-bottom: 20px; /* 增加列表项之间的间距 */
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* 确保内容不会溢出 */
   position: relative; /* 为下拉菜单定位 */
 }
 
 .note-content {
-  flex: 1;
-  margin-right: 10px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: 15px;
   background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.note-content span {
+  display: block;
+  margin-bottom: 5px;
 }
 
 .timestamp-dropdown-container {
@@ -259,17 +254,18 @@ li {
 
 .feedback-container {
   margin-top: 10px;
+  padding: 15px;
   background-color: #e6f3ff; /* 略微不同的背景色 */
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #b3d9ff; /* 不同的边框颜色 */
+  border-top: 1px solid #b3d9ff; /* 不同的边框颜色 */
   font-size: 0.9em; /* 稍微小一点的字体 */
   color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 轻微的阴影 */
 }
 
 .feedback-container p {
-  margin: 5px 0;
+  margin: 0;
+  color: #333;
+  font-size: 0.9em;
 }
 
 .feedback-container p:first-child {
