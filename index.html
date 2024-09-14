@@ -3,20 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>ThinkBox</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>欢迎</h1>
-            <div class="user-info">
-                <span id="userEmail"></span>
-                <button id="logoutButton" class="logout-button">登出</button>
-            </div>
+    <div id="app">
+        <h1>ThinkBox</h1>
+        <button id="logoutButton" class="logout-button">logout</button>
+        <div class="input-container">
+            <textarea id="noteInput" placeholder="Enter your note here..."></textarea>
+            <button id="addNoteButton">+</button>
+        </div>
+            <!-- 增加一个空行 -->
+    <br>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search notes...">
         </div>
         <ul id="noteList"></ul>
-    </div>
+    </div>  
     <script type="module" src="./script.js"></script>
 </body>
 </html>
