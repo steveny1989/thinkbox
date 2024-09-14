@@ -18,11 +18,14 @@ document.getElementById('logoutButton').addEventListener('click', logoutUser);
 
 // 监听用户状态变化
 onAuthStateChanged(auth, (user) => {
+    const userEmailElement = document.getElementById('userEmail');
     if (user) {
         console.log("User is signed in:", user);
+        userEmailElement.textContent = user.email; // 显示用户的邮箱
         // 用户已登录，可以在这里执行登录后的操作
     } else {
         console.log("No user is signed in.");
+        userEmailElement.textContent = ''; // 清空用户邮箱
         window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
     }
 });
@@ -202,3 +205,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 loadNotes(); // 加载笔记
+
+// 页面加载完成后检查用户状态
+document.addEventListener('DOMContentLoaded', (event) => {
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
+        }
+    });
+});
