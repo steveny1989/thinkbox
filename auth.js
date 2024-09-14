@@ -20,32 +20,42 @@ async function registerUser() {
     loadingDiv.style.display = "block";
 
     try {
+        // 使用 Firebase 创建用户
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // 获取 ID token
+        const idToken = await user.getIdToken();
+
+        // 同步用户信息到后端
         const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
             },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({
+                email: user.email,
+                uid: user.uid,
+                // 如果你想包含用户名，可以添加一个输入字段并在这里包含
+                // name: document.getElementById('registerName').value
+            })
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            if (errorData.error === 'Email already in use') {
-                errorDiv.textContent = "This email is already registered. Please use a different email or try logging in.";
-            } else {
-                throw new Error(errorData.error || 'Failed to register');
-            }
-        } else {
-            const data = await response.json();
-            console.log('User registered successfully:', data);
-            alert("注册成功！");
-            window.location.href = "index.html";
+            throw new Error(errorData.error || 'Failed to sync user with backend');
         }
+
+        const data = await response.json();
+        console.log('User registered and synced successfully:', data);
+        alert("注册成功！");
+        window.location.href = "index.html";
     } catch (error) {
         console.error("Error registering user:", error);
         errorDiv.textContent = "注册失败：" + error.message;
-    } finally {
         errorDiv.style.display = "block";
+    } finally {
         loadingDiv.style.display = "none";
     }
 }
