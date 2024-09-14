@@ -20,12 +20,15 @@ async function registerUser() {
     loadingDiv.style.display = "block";
 
     try {
+        // 使用 Firebase 创建用户
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log("User registered:", user);
 
-        // 将用户信息同步到后端数据库
+        // 获取 ID token
         const idToken = await user.getIdToken();
+
+        // 同步用户信息到后端
         const response = await fetch(`${BASE_API_URL}/users`, {
             method: 'POST',
             headers: {
@@ -33,8 +36,8 @@ async function registerUser() {
                 'Authorization': `Bearer ${idToken}`
             },
             body: JSON.stringify({
-                user_id: user.uid,
-                email: user.email
+                email: user.email,
+                uid: user.uid
             })
         });
 
