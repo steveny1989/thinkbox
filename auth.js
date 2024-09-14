@@ -1,5 +1,7 @@
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from './firebase.js';
 
+const BASE_API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
+
 // 用户注册函数
 async function registerUser() {
     const email = document.getElementById('registerEmail').value;
@@ -19,8 +21,29 @@ async function registerUser() {
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        console.log("User registered:", userCredential.user);
+        const user = userCredential.user;
+        console.log("User registered:", user);
+
+        // 将用户信息同步到后端数据库
+        const idToken = await user.getIdToken();
+        const response = await fetch(`${BASE_API_URL}/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                user_id: user.uid,
+                email: user.email
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to sync user with backend');
+        }
+
         alert("注册成功！");
+        window.location.href = "index.html";
     } catch (error) {
         console.error("Error registering user:", error);
         errorDiv.textContent = "注册失败：" + error.message;
@@ -49,9 +72,26 @@ async function loginUser() {
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log("User logged in:", userCredential.user);
+        const user = userCredential.user;
+        console.log("User logged in:", user);
+
+        // 验证用户并获取额外信息
+        const idToken = await user.getIdToken();
+        const response = await fetch(`${BASE_API_URL}/users/${user.uid}`, {
+            headers: {
+                'Authorization': `Bearer ${idToken}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user data from backend');
+        }
+
+        const userData = await response.json();
+        console.log("User data from backend:", userData);
+
         alert("登录成功！");
-        window.location.href = "index.html"; // 登录成功后跳转到主页面
+        window.location.href = "index.html";
     } catch (error) {
         console.error("Error logging in user:", error);
         errorDiv.textContent = "登录失败：" + error.message;
