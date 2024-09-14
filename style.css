@@ -76,7 +76,7 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #fff; /* 笔记列表项��背景色 */
+  background-color: #fff; /* 笔记列表项的背景色 */
   margin-bottom: 10px; /* 10px */
   padding: 10px; /* 10px */
   border: 1px solid #ccc; /* 1px */
@@ -118,7 +118,7 @@ li {
   background: none; /* 移除背景 */
   color: #007BFF; /* 蓝色 */
   border: none;
-  font-size: 0.5rem; /* 调整字体大小 */
+  font-size: 0.25rem; /* 调整字体大小 */
   cursor: pointer;
   padding: 0; /* 移除内边距 */
   margin: 0; /* 移除外边距 */
@@ -128,7 +128,7 @@ li {
 
 .dropdown-button::after {
   content: '⋮'; /* 使用竖向省略号 */
-  font-size: 1rem; /* 调整字体大小 */
+  font-size: 0.375rem; /* 调整字体大小 */
   color: #007BFF; /* 蓝色 */
   display: inline-block;
   vertical-align: middle;

@@ -4,7 +4,7 @@
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
     
-    // Firebase 配置
+    // Firebase 配置什么
     const firebaseConfig = {
       apiKey: "AIzaSyCUEVjMFHilowCjviJSJ8aeWGItRSSvdbY",
       authDomain: "cool-citadel-427909-s2.firebaseapp.com",
