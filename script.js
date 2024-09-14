@@ -1,4 +1,4 @@
-const API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
+const BASE_API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
 import { auth, signOut, onAuthStateChanged } from './firebase.js';
 
@@ -15,6 +15,27 @@ async function logoutUser() {
     } catch (error) {
         console.error("Error signing out:", error);
     }
+}
+
+// 函数：调用 Hugging Face API 获取反馈
+async function getFeedback(noteInput) {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      inputs: noteInput
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data[0]?.generated_text || 'No feedback available';
 }
 
 // 绑定登出按钮事件处理程序
@@ -42,10 +63,10 @@ async function loadNotes() {
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 设置超时为 10 秒
 
   try {
-    const response = await fetch(`${API_URL}/notes`, { signal: controller.signal }); // 发送 GET 请求获取笔记
+    const response = await fetch(`${BASE_API_URL}/notes`, { signal: controller.signal }); // 发送 GET 请求获取笔记
     clearTimeout(timeoutId); // 清除超时
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`); // 检��响应状态
+      throw new Error(`HTTP error! status: ${response.status}`); // 检查响应状态
     }
     const notesData = await response.json(); // 解析响应数据
     console.log('Loaded notes:', notesData); // 打印调试信息
@@ -64,7 +85,6 @@ async function loadNotes() {
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value; // 获取输入的笔记内容
   const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
-  const feedbackContainer = document.getElementById('feedbackContainer'); // 获取反馈容器
   if (noteInput) {
     try {
         // 获取当前时间戳
@@ -74,6 +94,12 @@ async function addNote() {
         const noteList = document.getElementById('noteList'); // 获取笔记列表
         const newNote = document.createElement('li'); // 创建新的列表项
         newNote.innerHTML = `<span>${noteInput}</span> <span class="timestamp">${formatTimestamp(timestamp)}</span>`; // 设置列表项的内容
+
+        // 创建反馈容器
+        const feedbackContainer = document.createElement('div'); // 创建反馈容器
+        feedbackContainer.className = 'feedback-container';
+        newNote.appendChild(feedbackContainer); // 将反馈容器添加到列表项
+
         noteList.appendChild(newNote); // 将列表项添加到笔记列表
 
         // 获取反馈
@@ -86,6 +112,7 @@ async function addNote() {
         document.getElementById('noteInput').value = ''; // 清空笔记输入框
     } catch (error) {
         console.error('Error getting feedback:', error);
+        const feedbackContainer = document.querySelector('.feedback-container');
         feedbackContainer.textContent = 'Error getting feedback. Please try again later.'; // 显示错误信息
     }
   } else {
