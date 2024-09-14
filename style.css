@@ -113,13 +113,12 @@ li {
   display: inline-block;
 }
 
-.dropdown button {
+.dropdown-button {
   font-family: 'Noto Sans SC', sans-serif; /* 使用思源黑体 */
   background: none; /* 移除背景 */
   color: #007BFF; /* 蓝色 */
   border: none;
-  font-size: 1.125rem; /* 18px */
-  font-weight: bold; /* 加粗字体 */
+  font-size: 1 rem; /* 增大字体 */
   cursor: pointer;
   padding: 0; /* 移除内边距 */
   margin: 0; /* 移除外边距 */
@@ -127,8 +126,14 @@ li {
   margin-left: 10px; /* 增加按钮和时间戳之间的间距 */
 }
 
+.dropdown-button::after {
+  content: '⋮'; /* 使用竖向省略号 */
+  font-size: 1rem; /* 增大字体 */
+  color: #007BFF; /* 蓝色 */
+}
+
 .dropdown-content {
-  display:none;
+  display: none; /* 默认隐藏 */
   position: absolute;
   right: 0;
   background-color: #fff;
@@ -152,7 +157,7 @@ li {
 }
 
 .dropdown:hover .dropdown-content {
-  display: block;
+  display: block; /* 悬停时显示 */
 }
 
 .edit-input {
