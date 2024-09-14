@@ -109,7 +109,6 @@ li {
 }
 
 .dropdown {
-  content:'⋮';
   position: relative;
   display: inline-block;
 }
@@ -129,6 +128,7 @@ li {
 }
 
 .dropdown-content {
+  display:none;
   position: absolute;
   right: 0;
   background-color: #fff;
