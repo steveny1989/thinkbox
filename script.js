@@ -102,8 +102,8 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
     dropdown.className = 'dropdown';
 
     const dropdownButton = document.createElement('button'); // 创建下拉菜单按钮
-    dropdownButton.innerHTML = '<i class="fas fa-ellipsis-h"></i>'; // 使用 Font Awesome 图标
-
+    dropdownButton.className = 'small-button'; // 修改为 small-button 类
+    
     const dropdownContent = document.createElement('div'); // 创建下拉菜单内容
     dropdownContent.className = 'dropdown-content';
 
@@ -116,7 +116,6 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
     };
 
     dropdownContent.appendChild(deleteLink); // 将删除链接添加到下拉菜单内容
-
     dropdown.appendChild(dropdownButton); // 将按钮添加到下拉菜单
     dropdown.appendChild(dropdownContent); // 将内容添加到下拉菜单
 
