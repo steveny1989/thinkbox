@@ -60,6 +60,11 @@ const api = {
 // 笔记操作函数
 const noteOperations = {
   async loadNotes() {
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('No user logged in, skipping note loading');
+      return;
+    }
     try {
       notes = await api.getNotes();
       notes.forEach(note => {
