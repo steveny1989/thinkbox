@@ -98,12 +98,13 @@ async function addNote() {
         // 添加笔记到列表
         const noteList = document.getElementById('noteList'); // 获取笔记列表
         const newNote = document.createElement('li'); // 创建新的列表项
-        newNote.innerHTML = `<span>${noteInput}</span> <span class="timestamp">${formatTimestamp(timestamp)}</span>`; // 设置列表项的内容
-
-        // 创建反馈容器
-        const feedbackContainer = document.createElement('div'); // 创建反馈容器
-        feedbackContainer.className = 'feedback-container';
-        newNote.appendChild(feedbackContainer); // 将反馈容器添加到列表项
+        newNote.innerHTML = `
+          <div class="note-content">
+            <span>${noteInput}</span>
+            <span class="timestamp">${formatTimestamp(timestamp)}</span>
+          </div>
+          <div class="feedback-container"></div>
+        `; // 设置列表项的内容
 
         noteList.appendChild(newNote); // 将列表项添加到笔记列表
 
@@ -113,13 +114,13 @@ async function addNote() {
         console.log('Received feedback:', feedback); // 调试日志
         const feedbackElement = document.createElement('p'); // 创建新的段落元素
         feedbackElement.textContent = `Feedback: ${feedback}`;
-        feedbackContainer.appendChild(feedbackElement); // 将段落元素添加到反馈容器
+        newNote.querySelector('.feedback-container').appendChild(feedbackElement); // 将段落元素添加到反馈容器
 
         // 清空输入框
         document.getElementById('noteInput').value = ''; // 清空笔记输入框
     } catch (error) {
         console.error('Error getting feedback:', error);
-        const feedbackContainer = document.querySelector('.feedback-container');
+        const feedbackContainer = newNote.querySelector('.feedback-container');
         feedbackContainer.textContent = 'Error getting feedback. Please try again later.'; // 显示错误信息
     }
   } else {
@@ -156,9 +157,9 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
   filteredNotes.forEach((note, index) => {
     const li = document.createElement('li'); // 创建列表项
 
-    const noteText = document.createElement('span'); // 创建笔记文本元素
-    noteText.className = 'note-content';
-    noteText.innerHTML = highlightText(note.text, searchInput); // 高亮显示搜索关键词
+    const noteContent = document.createElement('div'); // 创建笔记内容容器
+    noteContent.className = 'note-content';
+    noteContent.innerHTML = highlightText(note.text, searchInput); // 高亮显示搜索关键词
 
     const timestampDropdownContainer = document.createElement('div'); // 创建时间戳和下拉菜单容器
     timestampDropdownContainer.className = 'timestamp-dropdown-container';
@@ -190,8 +191,8 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
     timestampDropdownContainer.appendChild(timestamp); // 将时间戳添加到容器
     timestampDropdownContainer.appendChild(dropdown); // 将下拉菜单添加到容器
 
-    li.appendChild(noteText); // 将笔记文本添加到列表项
-    li.appendChild(timestampDropdownContainer); // 将容器添加到列表项
+    noteContent.appendChild(timestampDropdownContainer); // 将时间戳和下拉菜单容器添加到笔记内容容器
+    li.appendChild(noteContent); // 将笔记内容容器添加到列表项
 
     // 创建反馈容器
     const feedbackContainer = document.createElement('div'); // 创建反馈容器
