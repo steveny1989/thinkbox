@@ -128,7 +128,7 @@ li {
 }
 
 .dropdown-content {
-  display: none;
+  content:'⋮';
   position: absolute;
   right: 0;
   background-color: #fff;
