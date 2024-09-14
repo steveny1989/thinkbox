@@ -3,31 +3,64 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  background-color: #f4f4f9; /* 背景颜色 */
 }
 
-h1 {
+h1, h2 {
   text-align: center;
   color: #007BFF; /* 蓝色 */
-  font-size: 2.5rem; /* 更大的字体 */
   margin-bottom: 1.25rem; /* 20px */
 }
 
 .container {
-  position: relative; /* 为绝对定位的按钮提供参考 */
   width: 100%;
-  max-width: 800px; /* 800px */
+  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #fff; /* 白色背景 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  border-radius: 10px; /* 圆角 */
 }
 
-.textarea-container {
-  position: relative; /* 为绝对定位的按钮提供参考 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
 }
 
-textarea#noteInput {
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+#userEmail {
+  margin-right: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.logout-button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background-color: #0056b3;
+}
+
+.input-container, .search-container {
+  margin-bottom: 20px;
+}
+
+textarea#noteInput, #searchInput {
   width: 100%;
-  height: 100px; /* 你可以根据需要调整高度 */
-  margin-bottom: 10px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -38,9 +71,8 @@ textarea#noteInput {
   transition: background-color 0.3s;
 }
 
-textarea#noteInput:hover {
-  background-color: #cce4ff;
-  color: black;
+textarea#noteInput:hover, #searchInput:hover {
+  background-color: #e0f0ff;
 }
 
 button {
@@ -168,23 +200,6 @@ li {
   font-size: 1rem; /* 16px */
 }
 
-#searchInput {
-  width: 100%; /* 确保宽度与其他元素一致 */
-  background-color: #f9f9f9; /* 设置背景色 */
-  padding: 10px; /* 10px */
-  margin-bottom: 10px; /* 10px */
-  border: 1px solid #ccc; /* 1px */
-  border-radius: 5px; /* 5px */
-  font-size: 16px; /* 16px */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
-  box-sizing: border-box; /* 确保内边距和边框包含在元素的总宽度和高度内 */
-}
-
-#searchInput:hover {
-  background-color: #cce4ff; /* 悬停时变成较浅的蓝色 */
-  color: black; /* 保持文本颜色为黑色以确保可读性 */
-}
-
 .highlight {
   background-color: #cce4ff; /* 高亮显示的背景颜色 */
 }
@@ -207,13 +222,6 @@ li {
   margin-bottom: 20px;
 }
 
-#searchInput {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
 .small-button {
   font-family: 'Noto Sans SC', sans-serif; /* 使用思黑体 */
   background: none;
@@ -234,37 +242,4 @@ li {
 .small-button:hover {
   background-color:  #007bff; /* 深蓝色 */
   transform: scale(1.05); /* 悬停时放大 */
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #ddd;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-#userEmail {
-  margin-right: 10px;
-  font-size: 14px;
-  color: #333;
-}
-
-.logout-button {
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.logout-button:hover {
-  background-color: #0056b3;
 }
