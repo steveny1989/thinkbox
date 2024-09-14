@@ -128,13 +128,14 @@ li {
 
 .note-content {
   flex: 1;
-  margin-right: 10px; /* 10px */
+  margin-right: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background-color: #f9f9f9; /* 设置背景色与textarea一致 */
-  padding: 10px; /* 10px */
-  border-radius: 5px; /* 5px */
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #e0e0e0;
 }
 
 .timestamp-dropdown-container {
@@ -257,6 +258,22 @@ li {
 }
 
 .feedback-container {
-    margin-top: 10px; /* 添加一些上边距 */
+  margin-top: 10px;
+  background-color: #e6f3ff; /* 略微不同的背景色 */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #b3d9ff; /* 不同的边框颜色 */
+  font-size: 0.9em; /* 稍微小一点的字体 */
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 轻微的阴影 */
+}
+
+.feedback-container p {
+  margin: 5px 0;
+}
+
+.feedback-container p:first-child {
+  font-weight: bold;
+  color: #007BFF; /* 使用主题蓝色 */
 }
 
