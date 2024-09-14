@@ -18,28 +18,43 @@ async function logoutUser() {
 }
 
 // 函数：调用 Hugging Face API 获取反馈
-async function getFeedback(noteInput) {
-  console.log('Calling Hugging Face API with input:', noteInput); // 调试日志
+async function getFeedback(noteInput, retries = 3) {
+  console.log('Calling Hugging Face API with input:', noteInput);
 
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      inputs: noteInput
-    })
-  });
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          inputs: noteInput
+        })
+      });
 
-  if (!response.ok) {
-    console.error('Hugging Face API response error:', response.status); // 调试日志
-    throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        console.error('Hugging Face API response error:', response.status);
+        if (i === retries - 1) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // 如果不是最后一次重试，等待一段时间后继续
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+        continue;
+      }
+
+      const data = await response.json();
+      console.log('Hugging Face API response data:', data);
+      return data[0]?.generated_text || 'No feedback available';
+    } catch (error) {
+      if (i === retries - 1) {
+        throw error;
+      }
+      // 如果不是最后一次重试，等待一段时间后继续
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+    }
   }
-
-  const data = await response.json();
-  console.log('Hugging Face API response data:', data); // 调试日志
-  return data[0]?.generated_text || 'No feedback available';
 }
 
 // 绑定登出按钮事件处理程序
@@ -92,30 +107,48 @@ async function addNote() {
     try {
       const timestamp = new Date().toISOString();
       
-      // 创建新的笔记项
-      const newNote = document.createElement('li');
-      newNote.innerHTML = `
-        <div class="note-content">
-          <span>${noteInput}</span>
-          <div class="timestamp-container">
-            <span class="timestamp">${formatTimestamp(timestamp)}</span>
-          </div>
-          <div class="feedback-container"></div>
-        </div>
-      `;
-      document.getElementById('noteList').appendChild(newNote);
+      let feedback = 'Unable to get feedback at this time';
+      try {
+        // 获取反馈
+        feedback = await getFeedback(noteInput);
+      } catch (feedbackError) {
+        console.error('Error getting feedback:', feedbackError);
+        // 继续执行，使用默认反馈消息
+      }
 
-      // 获取反馈
-      const feedback = await getFeedback(noteInput);
+      // 创建新笔记对象
+      const newNote = {
+        text: noteInput,
+        timestamp: timestamp,
+        feedback: feedback
+      };
 
-      // 添加反馈到笔记项
-      const feedbackContainer = newNote.querySelector('.feedback-container');
-      feedbackContainer.innerHTML = `<p>ThinkBox: ${feedback}</p>`;
+      // 发送新笔记到服务器
+      const response = await fetch(`${BASE_API_URL}/notes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newNote),
+      });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const savedNote = await response.json();
+      
+      // 将新笔记添加到数组
+      notes.unshift(savedNote);
+
+      // 更新笔记列表显示
+      updateNoteList();
+
+      // 清空输入框
       document.getElementById('noteInput').value = '';
     } catch (error) {
-      console.error('Error getting feedback:', error);
-      alert('Error getting feedback. Please try again later.');
+      console.error('Error adding note:', error);
+      alert('Error adding note. The note was saved without feedback. Please try again later for feedback.');
     }
   } else {
     alert('Note content cannot be empty!');
@@ -124,15 +157,26 @@ async function addNote() {
 
 // 异步函数：删除笔记
 async function deleteNote(index) {
-  const note = notes[index]; // 获取要删除的笔记
   try {
-    await fetch(`${API_URL}/notes/${note.id}`, {
-      method: 'DELETE' // 发送 DELETE 请求删除笔记
+    const noteId = notes[index].id;
+    console.log('Attempting to delete note with ID:', noteId); // 调试日志
+
+    const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
+      method: 'DELETE'
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('Note deleted successfully on server'); // 调试日志
+
     notes.splice(index, 1); // 从笔记数组中移除笔记
     updateNoteList(); // 更新笔记列表
+    console.log('Note removed from local array and list updated'); // 调试日志
   } catch (error) {
-    console.error('Error deleting note:', error); // 错误处理
+    console.error('Error deleting note:', error);
+    alert('Error deleting note. Please try again.');
   }
 }
 
@@ -159,67 +203,26 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
           <div class="dropdown">
             <button class="small-button"></button>
             <div class="dropdown-content">
-              <a href="#" onclick="event.preventDefault(); deleteNote(${index});"><i class="fas fa-trash-alt"></i> 删除</a>
+              <a href="#" class="delete-note" data-index="${index}"><i class="fas fa-trash-alt"></i> 删除</a>
             </div>
           </div>
         </div>
         <div class="feedback-container">
-          ${note.feedback ? `<p class="feedback">Feedback: ${note.feedback}</p>` : ''}
+          ${note.feedback ? `<p class="feedback">ThinkBox: ${note.feedback}</p>` : ''}
         </div>
       </div>
     `;
 
-    const noteContent = document.createElement('div'); // 创建笔记内容容器
-    noteContent.className = 'note-content';
-    noteContent.innerHTML = highlightText(note.text, searchInput); // 高亮显示搜索关键词
-
-    const timestampDropdownContainer = document.createElement('div'); // 创建时间戳和下拉菜单容器
-    timestampDropdownContainer.className = 'timestamp-dropdown-container';
-
-    const timestamp = document.createElement('span'); // 创建时间戳元素
-    timestamp.className = 'timestamp';
-    timestamp.textContent = formatTimestamp(note.timestamp); // 格式化时间戳
-
-    const dropdown = document.createElement('div'); // 创建下拉菜单
-    dropdown.className = 'dropdown';
-
-    const dropdownButton = document.createElement('button'); // 创建下拉菜单按钮
-    dropdownButton.className = 'small-button'; // 修改为 small-button 类
-    const dropdownContent = document.createElement('div'); // 创建下拉菜单内容
-    dropdownContent.className = 'dropdown-content';
-
-    const deleteLink = document.createElement('a'); // 创建删除链接
-    deleteLink.innerHTML = '<i class="fas fa-trash-alt"></i> 删除'; // 使用 Font Awesome 图标
-    deleteLink.href = '#';
-    deleteLink.onclick = (event) => {
-      event.preventDefault();
-      deleteNote(index); // 删除笔记
-    };
-
-    dropdownContent.appendChild(deleteLink); // 将删除链接添加到下拉菜单内容
-    dropdown.appendChild(dropdownButton); // 将按钮添加到下拉菜单
-    dropdown.appendChild(dropdownContent); // 将内容添加到下拉菜单
-
-    timestampDropdownContainer.appendChild(timestamp); // 将时间戳添加到容器
-    timestampDropdownContainer.appendChild(dropdown); // 将下拉菜单添加到容器
-
-    noteContent.appendChild(timestampDropdownContainer); // 将时间戳和下拉菜单容器添加到笔记内容容器
-    li.appendChild(noteContent); // 将笔记内容容器添加到列表项
-
-    // 创建反馈容器
-    const feedbackContainer = document.createElement('div'); // 创建反馈容器
-    feedbackContainer.className = 'feedback-container';
-
-    // 添加反馈信息
-    if (note.feedback) {
-      const feedbackElement = document.createElement('p'); // 创建反馈元素
-      feedbackElement.className = 'feedback';
-      feedbackElement.textContent = `Feedback: ${note.feedback}`; // 设置反馈内容
-      feedbackContainer.appendChild(feedbackElement); // 将反馈元素添加到反馈容器
-    }
-
-    li.appendChild(feedbackContainer); // 将反馈容器添加到列表项
     noteList.appendChild(li); // 将列表项添加到笔记列表
+  });
+
+  // 为所有删除按钮添加事件监听器
+  document.querySelectorAll('.delete-note').forEach(button => {
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
+      const index = parseInt(this.getAttribute('data-index'));
+      deleteNote(index);
+    });
   });
 }
 
