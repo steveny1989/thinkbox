@@ -223,6 +223,7 @@ li {
   color: white;
   border-radius: 4px;
   cursor: pointer;
+  margin-top: 10px; /* 增加顶部外边距 */
 }
 
 #addNoteButton:hover {

@@ -88,6 +88,7 @@ async function loadNotes() {
 // 异步函数：添加笔记
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value; // 获取输入的笔记内容
+  console.log('Note input value:', noteInput); // 调试日志
   const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
   if (noteInput) {
     try {
@@ -107,7 +108,9 @@ async function addNote() {
         noteList.appendChild(newNote); // 将列表项添加到笔记列表
 
         // 获取反馈
+        console.log('Fetching feedback for note:', noteInput); // 调试日志
         const feedback = await getFeedback(noteInput); // 调用 Hugging Face API 获取反馈
+        console.log('Received feedback:', feedback); // 调试日志
         const feedbackElement = document.createElement('p'); // 创建新的段落元素
         feedbackElement.textContent = `Feedback: ${feedback}`;
         feedbackContainer.appendChild(feedbackElement); // 将段落元素添加到反馈容器
@@ -227,15 +230,21 @@ function formatTimestamp(timestamp) {
 
 // DOMContentLoaded 事件：页面加载完成后执行
 document.addEventListener('DOMContentLoaded', (event) => {
+  console.log('DOM fully loaded and parsed'); // 调试日志
+
   const addNoteButton = document.getElementById('addNoteButton'); // 获取添加笔记按钮
   const noteInput = document.getElementById('noteInput'); // 获取笔记输入框
   const searchInput = document.getElementById('searchInput'); // 获取搜索输入框
 
   if (addNoteButton) {
+    console.log('Add Note button found'); // 调试日志
     addNoteButton.addEventListener('click', addNote); // 添加笔记的逻辑
+  } else {
+    console.error('Add Note button not found'); // 调试日志
   }
 
   if (noteInput) {
+    console.log('Note input found'); // 调试日志
     noteInput.addEventListener('input', () => {
       // 输入笔记的逻辑
     });
@@ -246,10 +255,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
         addNote();
       }
     });
+  } else {
+    console.error('Note input not found'); // 调试日志
   }
 
   if (searchInput) {
+    console.log('Search input found'); // 调试日志
     searchInput.addEventListener('input', searchNotes); // 搜索笔记的逻辑
+  } else {
+    console.error('Search input not found'); // 调试日志
   }
 });
 
