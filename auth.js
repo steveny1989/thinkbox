@@ -1,4 +1,4 @@
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from './firebase.js';
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from './firebase.js';
 
 // 用户注册函数
 async function registerUser() {
@@ -64,3 +64,14 @@ async function loginUser() {
 // 绑定事件处理程序
 document.getElementById('registerButton').addEventListener('click', registerUser);
 document.getElementById('loginButton').addEventListener('click', loginUser);
+
+// 监听用户状态变化
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user);
+        // 用户已登录，可以在这里执行登录后的操作
+    } else {
+        console.log("No user is signed in.");
+        // 用户未登录，可以在这里执行未登录时的操作
+    }
+});

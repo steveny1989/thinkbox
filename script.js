@@ -1,5 +1,32 @@
 const API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
+import { auth, signOut, onAuthStateChanged } from './firebase.js';
+
+// 用户登出函数
+async function logoutUser() {
+    try {
+        await signOut(auth);
+        console.log("User signed out");
+        window.location.href = "auth.html"; // 登出后跳转到登录页面
+    } catch (error) {
+        console.error("Error signing out:", error);
+    }
+}
+
+// 绑定登出按钮事件处理程序
+document.getElementById('logoutButton').addEventListener('click', logoutUser);
+
+// 监听用户状态变化
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        console.log("User is signed in:", user);
+        // 用户已登录，可以在这里执行登录后的操作
+    } else {
+        console.log("No user is signed in.");
+        window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
+    }
+});
+
 let notes = []; // 存储笔记的数组
 
 // 异步函数：加载笔记
@@ -103,7 +130,6 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
 
     const dropdownButton = document.createElement('button'); // 创建下拉菜单按钮
     dropdownButton.className = 'small-button'; // 修改为 small-button 类
-    
     const dropdownContent = document.createElement('div'); // 创建下拉菜单内容
     dropdownContent.className = 'dropdown-content';
 
