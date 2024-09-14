@@ -20,38 +20,32 @@ async function registerUser() {
     loadingDiv.style.display = "block";
 
     try {
-        // 使用 Firebase 创建用户
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log("User registered:", user);
-
-        // 获取 ID token
-        const idToken = await user.getIdToken();
-
-        // 同步用户信息到后端
-        const response = await fetch(`${BASE_API_URL}/users`, {
+        const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                email: user.email,
-                uid: user.uid
-            })
+            body: JSON.stringify({ email, password })
         });
 
         if (!response.ok) {
-            throw new Error('Failed to sync user with backend');
+            const errorData = await response.json();
+            if (errorData.error === 'Email already in use') {
+                errorDiv.textContent = "This email is already registered. Please use a different email or try logging in.";
+            } else {
+                throw new Error(errorData.error || 'Failed to register');
+            }
+        } else {
+            const data = await response.json();
+            console.log('User registered successfully:', data);
+            alert("注册成功！");
+            window.location.href = "index.html";
         }
-
-        alert("注册成功！");
-        window.location.href = "index.html";
     } catch (error) {
         console.error("Error registering user:", error);
         errorDiv.textContent = "注册失败：" + error.message;
-        errorDiv.style.display = "block";
     } finally {
+        errorDiv.style.display = "block";
         loadingDiv.style.display = "none";
     }
 }
