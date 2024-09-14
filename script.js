@@ -186,7 +186,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // 加载笔记
-  loadNotes();
+  loadNotes().then(() => {
+    console.log('Notes loading process completed');
+  });
 });
 
 // 定义 loadNotes 函数
