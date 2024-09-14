@@ -13,7 +13,16 @@ let feedbacks = {};
 // API 调用函数
 const api = {
   async getNotes() {
-    const response = await fetch(`${BASE_API_URL}/notes`);
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+    const idToken = await user.getIdToken();
+    const response = await fetch(`${BASE_API_URL}/notes`, {
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
     if (!response.ok) throw new Error('Failed to fetch notes');
     return response.json();
   },
@@ -158,10 +167,12 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         console.log("User is signed in:", user);
         userEmailElement.textContent = user.email; // 显示用户的邮箱
-        // 用户已登录，可以在这里执行登录后的操作
+        noteOperations.loadNotes(); // 加载用户的笔记
     } else {
         console.log("No user is signed in.");
         userEmailElement.textContent = ''; // 清空用户邮箱
+        notes = []; // 清空笔记
+        updateNoteList(); // 更新 UI 以显示空的笔记列表
         window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
     }
 });
