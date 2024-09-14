@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <div class="header">
+            <h1></h1>
+            <div class="user-info">
+                <span id="userEmail"></span>
+                <button id="logoutButton" class="logout-button">Logout</button>
+            </div>
     <div id="app">
-        <h1>ThinkBox</h1>
+        <h2>ThinkBox</h2>
         <div class="input-container">
             <textarea id="noteInput" placeholder="Enter your note here..."></textarea>
             <button id="addNoteButton">+</button>
@@ -20,13 +27,7 @@
         </div>
         <ul id="noteList"></ul>
     </div>  
-    <div class="container">
-        <div class="header">
-            <h2></h2>
-            <div class="user-info">
-                <span id="userEmail"></span>
-                <button id="logoutButton" class="logout-button">Logout</button>
-            </div>
+
     <script type="module" src="./script.js"></script>
 </body>
 </html>
