@@ -219,28 +219,22 @@ li {
 
 .small-button {
   font-family: 'Noto Sans SC', sans-serif; /* 使用思黑体 */
-  background-color: #007BFF; /* 蓝色 */
+  background: none;
   color: white;
   border: none;
-  border-radius: 5px; /* 修改为圆角 */
-  width: 60px; /* 按钮宽度 */
-  height: 30px; /* 按钮高度 */
   font-size: 14px; /* 调整字体大小 */
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+  display: inline;
   transition: background-color 0.3s, transform 0.2s; /* 添加过渡效果 */
 }
 
 .small-button::after {
   content: '...'; /* 使用伪元素设置内容 */
   font-size: 14px; /* 调整字体大小 */
-  color: white; /* 设置文本颜色 */
+  color:  #007bff; /* 设置文本颜色 */
 }
 
 .small-button:hover {
-  background-color: #0056b3; /* 深蓝色 */
+  background-color:  #007bff; /* 深蓝色 */
   transform: scale(1.05); /* 悬停时放大 */
 }
