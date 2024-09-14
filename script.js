@@ -92,22 +92,6 @@ async function addNote() {
     try {
       const timestamp = new Date().toISOString();
       
-      // 确保 noteContainer 存在
-      let noteContainer = document.getElementById('noteContainer');
-      if (!noteContainer) {
-        noteContainer = document.createElement('div');
-        noteContainer.id = 'noteContainer';
-        document.body.appendChild(noteContainer);
-      }
-
-      // 确保 noteList 存在
-      let noteList = document.getElementById('noteList');
-      if (!noteList) {
-        noteList = document.createElement('ul');
-        noteList.id = 'noteList';
-        noteContainer.appendChild(noteList);
-      }
-
       // 创建新的笔记项
       const newNote = document.createElement('li');
       newNote.innerHTML = `
@@ -116,27 +100,29 @@ async function addNote() {
           <span class="timestamp">${formatTimestamp(timestamp)}</span>
         </div>
       `;
-      noteList.appendChild(newNote);
+      document.getElementById('noteList').appendChild(newNote);
 
       // 获取反馈
       const feedback = await getFeedback(noteInput);
 
-      // 确保 feedbackContainer 存在
+      // 创建新的反馈项
+      const feedbackItem = document.createElement('div');
+      feedbackItem.className = 'feedback-item';
+      feedbackItem.innerHTML = `
+        <p>ThinkBox: ${feedback}</p>
+      `;
+
+      // 获取或创建反馈容器
       let feedbackContainer = document.getElementById('feedbackContainer');
       if (!feedbackContainer) {
         feedbackContainer = document.createElement('div');
         feedbackContainer.id = 'feedbackContainer';
+        feedbackContainer.className = 'feedback-container';
         document.body.appendChild(feedbackContainer);
       }
 
-      // 创建新的反馈项
-      const feedbackElement = document.createElement('div');
-      feedbackElement.className = 'feedback-item';
-      feedbackElement.innerHTML = `
-        <p>Note: ${noteInput}</p>
-        <p>Feedback: ${feedback}</p>
-      `;
-      feedbackContainer.appendChild(feedbackElement);
+      // 将反馈项添加到反馈容器
+      feedbackContainer.appendChild(feedbackItem);
 
       document.getElementById('noteInput').value = '';
     } catch (error) {
