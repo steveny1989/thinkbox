@@ -87,44 +87,64 @@ async function loadNotes() {
 
 // 异步函数：添加笔记
 async function addNote() {
-  const noteInput = document.getElementById('noteInput').value; // 获取输入的笔记内容
-  console.log('Note input value:', noteInput); // 调试日志
-  const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
+  const noteInput = document.getElementById('noteInput').value;
   if (noteInput) {
     try {
-        // 获取当前时间戳
-        const timestamp = new Date().toISOString();
+      const timestamp = new Date().toISOString();
+      
+      // 确保 noteContainer 存在
+      let noteContainer = document.getElementById('noteContainer');
+      if (!noteContainer) {
+        noteContainer = document.createElement('div');
+        noteContainer.id = 'noteContainer';
+        document.body.appendChild(noteContainer);
+      }
 
-        // 添加笔记到列表
-        const noteList = document.getElementById('noteList'); // 获取笔记列表
-        const newNote = document.createElement('li'); // 创建新的列表项
-        newNote.innerHTML = `
-          <div class="note-content">
-            <span>${noteInput}</span>
-            <span class="timestamp">${formatTimestamp(timestamp)}</span>
-          </div>
-          <div class="feedback-container"></div>
-        `; // 设置列表项的内容
+      // 确保 noteList 存在
+      let noteList = document.getElementById('noteList');
+      if (!noteList) {
+        noteList = document.createElement('ul');
+        noteList.id = 'noteList';
+        noteContainer.appendChild(noteList);
+      }
 
-        noteList.appendChild(newNote); // 将列表项添加到笔记列表
+      // 创建新的笔记项
+      const newNote = document.createElement('li');
+      newNote.innerHTML = `
+        <div class="note-content">
+          <span>${noteInput}</span>
+          <span class="timestamp">${formatTimestamp(timestamp)}</span>
+        </div>
+      `;
+      noteList.appendChild(newNote);
 
-        // 获取反馈
-        console.log('Fetching feedback for note:', noteInput); // 调试日志
-        const feedback = await getFeedback(noteInput); // 调用 Hugging Face API 获取反馈
-        console.log('Received feedback:', feedback); // 调试日志
-        const feedbackElement = document.createElement('p'); // 创建新的段落元素
-        feedbackElement.textContent = `Feedback: ${feedback}`;
-        newNote.querySelector('.feedback-container').appendChild(feedbackElement); // 将段落元素添加到反馈容器
+      // 获取反馈
+      const feedback = await getFeedback(noteInput);
 
-        // 清空输入框
-        document.getElementById('noteInput').value = ''; // 清空笔记输入框
+      // 确保 feedbackContainer 存在
+      let feedbackContainer = document.getElementById('feedbackContainer');
+      if (!feedbackContainer) {
+        feedbackContainer = document.createElement('div');
+        feedbackContainer.id = 'feedbackContainer';
+        document.body.appendChild(feedbackContainer);
+      }
+
+      // 创建新的反馈项
+      const feedbackElement = document.createElement('div');
+      feedbackElement.className = 'feedback-item';
+      feedbackElement.innerHTML = `
+        <p>Note: ${noteInput}</p>
+        <p>Feedback: ${feedback}</p>
+      `;
+      feedbackContainer.appendChild(feedbackElement);
+
+      document.getElementById('noteInput').value = '';
     } catch (error) {
-        console.error('Error getting feedback:', error);
-        const feedbackContainer = newNote.querySelector('.feedback-container');
-        feedbackContainer.textContent = 'Error getting feedback. Please try again later.'; // 显示错误信息
+      console.error('Error getting feedback:', error);
+      alert('Error getting feedback. Please try again later.');
     }
   } else {
-    alert('Note content cannot be empty!'); // 提示用户输入内容不能为空
+    alert('Note content cannot be empty!');
   }
 }
 
