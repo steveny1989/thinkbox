@@ -93,6 +93,9 @@ const noteOperations = {
       console.log('Loading notes...');
       const notes = await api.getNotes();
       console.log('Notes loaded successfully:', notes);
+      if (notes.length === 0) {
+        console.log('No notes found or user not logged in');
+      }
       updateNoteList(notes);
     } catch (error) {
       console.error('Error loading notes:', error);
@@ -205,6 +208,9 @@ async function loadNotes() {
     console.log('Loading notes...');
     const notes = await api.getNotes();
     console.log('Notes loaded successfully:', notes);
+    if (notes.length === 0) {
+      console.log('No notes found or user not logged in');
+    }
     updateNoteList(notes);
   } catch (error) {
     console.error('Error loading notes:', error);
