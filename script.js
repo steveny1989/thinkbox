@@ -28,9 +28,17 @@ const api = {
   },
 
   async addNote(note) {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('No user logged in');
+    }
+    const idToken = await user.getIdToken();
     const response = await fetch(`${BASE_API_URL}/notes`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
       body: JSON.stringify(note)
     });
     if (!response.ok) throw new Error('Failed to add note');
@@ -60,19 +68,28 @@ const api = {
 // 笔记操作函数
 const noteOperations = {
   async loadNotes() {
-    const user = auth.currentUser;
-    if (!user) {
-      console.log('No user logged in, skipping note loading');
-      return;
-    }
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user logged in, skipping note loading');
+        return;
+      }
       notes = await api.getNotes();
-      notes.forEach(note => {
-        if (note.feedback) {
-          feedbacks[note.id] = note.feedback;
-        }
+      updateNoteList(); // 假设你有这个函数来更新 UI
+
+      // 添加日志来显示加载的笔记
+      console.log('Loaded notes:', notes);
+      
+      // 如果你想要更详细的日志，可以这样做：
+      notes.forEach((note, index) => {
+        console.log(`Note ${index + 1}:`, {
+          id: note.id,
+          content: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
+          createdAt: new Date(note.created_at).toLocaleString()
+        });
       });
-      updateNoteList();
+
+      console.log(`Total notes loaded: ${notes.length}`);
     } catch (error) {
       console.error('Error loading notes:', error);
       alert('Failed to load notes. Please try again later.');
@@ -138,19 +155,69 @@ function formatTimestamp(timestamp) {
 }
 
 // 事件监听器
-document.addEventListener('DOMContentLoaded', () => {
-  noteOperations.loadNotes();
+document.addEventListener('DOMContentLoaded', function() {
+  // 获取元素
+  const noteInput = document.getElementById('noteInput');
+  const addNoteButton = document.getElementById('addNoteButton');
+  const searchInput = document.getElementById('searchInput');
+  const noteList = document.getElementById('noteList');
+  const logoutButton = document.getElementById('logoutButton');
+  const userEmailSpan = document.getElementById('userEmail');
 
-  const addNoteForm = document.getElementById('addNoteForm');
-  addNoteForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const noteInput = document.getElementById('noteInput');
-    if (noteInput.value.trim()) {
-      await noteOperations.addNote(noteInput.value.trim());
-      noteInput.value = '';
-    }
-  });
+  // 添加笔记按钮事件监听器
+  if (addNoteButton) {
+    addNoteButton.addEventListener('click', function() {
+      // 添加笔记的逻辑
+    });
+  }
+
+  // 搜索输入事件监听器
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      // 搜索笔记的逻辑
+    });
+  }
+
+  // 登出按钮事件监听器
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      // 登出逻辑
+    });
+  }
+
+  // 加载笔记
+  loadNotes();
 });
+
+// 定义 loadNotes 函数
+async function loadNotes() {
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('No user logged in, skipping note loading');
+      return;
+    }
+    notes = await api.getNotes();
+    updateNoteList(); // 假设你有这个函数来更新 UI
+
+    // 添加日志来显示加载的笔记
+    console.log('Loaded notes:', notes);
+    
+    // 如果你想要更详细的日志，可以这样做：
+    notes.forEach((note, index) => {
+      console.log(`Note ${index + 1}:`, {
+        id: note.id,
+        content: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
+        createdAt: new Date(note.created_at).toLocaleString()
+      });
+    });
+
+    console.log(`Total notes loaded: ${notes.length}`);
+  } catch (error) {
+    console.error('Error loading notes:', error);
+    alert('Failed to load notes. Please try again later.');
+  }
+}
 
 // 用户登出函数
 async function logoutUser() {
