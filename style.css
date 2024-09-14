@@ -114,6 +114,7 @@ li {
 }
 
 .dropdown button {
+  content: '⋮';
   font-family: 'Noto Sans SC', sans-serif; /* 使用思源黑体 */
   background: none; /* 移除背景 */
   color: #007BFF; /* 蓝色 */
