@@ -18,6 +18,7 @@ const api = {
       throw new Error('No user logged in');
     }
     const idToken = await user.getIdToken();
+    console.log('ID Token:', idToken);
     const response = await fetch(`${BASE_API_URL}/notes`, {
       headers: {
         'Authorization': `Bearer ${idToken}`
