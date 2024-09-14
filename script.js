@@ -13,19 +13,39 @@ let feedbacks = {};
 // API 调用函数
 const api = {
   async getNotes() {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error('No user logged in');
-    }
-    const idToken = await user.getIdToken();
-    console.log('ID Token:', idToken);
-    const response = await fetch(`${BASE_API_URL}/notes`, {
-      headers: {
-        'Authorization': `Bearer ${idToken}`
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        console.log('No user logged in');
+        throw new Error('No user logged in');
       }
-    });
-    if (!response.ok) throw new Error('Failed to fetch notes');
-    return response.json();
+      console.log('Getting ID token for user:', user.uid);
+      const idToken = await user.getIdToken();
+      console.log('ID token obtained, making API call');
+      const response = await fetch(`${BASE_API_URL}/notes`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      console.log('API response status:', response.status);
+      console.log('API response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`Failed to fetch notes: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Notes data received:', data);
+      return data;
+    } catch (error) {
+      console.error('Error in getNotes:', error);
+      if (error instanceof TypeError) {
+        console.error('Network error: ', error.message);
+      }
+      throw error;
+    }
   },
 
   async addNote(note) {
@@ -70,30 +90,17 @@ const api = {
 const noteOperations = {
   async loadNotes() {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        console.log('No user logged in, skipping note loading');
-        return;
-      }
-      notes = await api.getNotes();
-      updateNoteList(); // 假设你有这个函数来更新 UI
-
-      // 添加日志来显示加载的笔记
-      console.log('Loaded notes:', notes);
-      
-      // 如果你想要更详细的日志，可以这样做：
-      notes.forEach((note, index) => {
-        console.log(`Note ${index + 1}:`, {
-          id: note.id,
-          content: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
-          createdAt: new Date(note.created_at).toLocaleString()
-        });
-      });
-
-      console.log(`Total notes loaded: ${notes.length}`);
+      console.log('Loading notes...');
+      const notes = await api.getNotes();
+      console.log('Notes loaded successfully:', notes);
+      updateNoteList(notes);
     } catch (error) {
       console.error('Error loading notes:', error);
-      alert('Failed to load notes. Please try again later.');
+      if (error.message.includes('Failed to fetch')) {
+        alert('Network error. Please check your internet connection and try again.');
+      } else {
+        alert('Failed to load notes. Please try again later.');
+      }
     }
   },
 
@@ -195,30 +202,17 @@ document.addEventListener('DOMContentLoaded', function() {
 // 定义 loadNotes 函数
 async function loadNotes() {
   try {
-    const user = auth.currentUser;
-    if (!user) {
-      console.log('No user logged in, skipping note loading');
-      return;
-    }
-    notes = await api.getNotes();
-    updateNoteList(); // 假设你有这个函数来更新 UI
-
-    // 添加日志来显示加载的笔记
-    console.log('Loaded notes:', notes);
-    
-    // 如果你想要更详细的日志，可以这样做：
-    notes.forEach((note, index) => {
-      console.log(`Note ${index + 1}:`, {
-        id: note.id,
-        content: note.content.substring(0, 50) + (note.content.length > 50 ? '...' : ''),
-        createdAt: new Date(note.created_at).toLocaleString()
-      });
-    });
-
-    console.log(`Total notes loaded: ${notes.length}`);
+    console.log('Loading notes...');
+    const notes = await api.getNotes();
+    console.log('Notes loaded successfully:', notes);
+    updateNoteList(notes);
   } catch (error) {
     console.error('Error loading notes:', error);
-    alert('Failed to load notes. Please try again later.');
+    if (error.message.includes('Failed to fetch')) {
+      alert('Network error. Please check your internet connection and try again.');
+    } else {
+      alert('Failed to load notes. Please try again later.');
+    }
   }
 }
 
