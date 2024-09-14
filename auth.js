@@ -73,29 +73,33 @@ async function loginUser() {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        console.log("User logged in:", user);
+        console.log('User logged in:', user);
 
-        // 验证用户并获取额外信息
+        // 获取 Firebase ID token
         const idToken = await user.getIdToken();
-        const response = await fetch(`${BASE_API_URL}/users/${user.uid}`, {
+
+        // 从后端获取用户数据
+        const response = await fetch(`https://178.128.81.19:3001/users/${user.uid}`, {
             headers: {
                 'Authorization': `Bearer ${idToken}`
             }
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch user data from backend');
+            const errorData = await response.json();
+            throw new Error(`Failed to fetch user data: ${errorData.error}`);
         }
 
         const userData = await response.json();
-        console.log("User data from backend:", userData);
+        console.log('User data from backend:', userData);
+
+        // ... 处理成功登录 ...
 
         alert("登录成功！");
         window.location.href = "index.html";
     } catch (error) {
         console.error("Error logging in user:", error);
-        errorDiv.textContent = "登录失败：" + error.message;
-        errorDiv.style.display = "block";
+        // ... 错误处理 ...
     } finally {
         loadingDiv.style.display = "none";
     }
