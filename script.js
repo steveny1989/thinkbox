@@ -162,6 +162,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
     noteInput.addEventListener('input', () => {
       // 输入笔记的逻辑
     });
+
+    // 添加 Command + Enter 监听器
+    noteInput.addEventListener('keydown', (event) => {
+      if (event.metaKey && event.key === 'Enter') {
+        addNote();
+      }
+    });
   }
 
   if (searchInput) {
