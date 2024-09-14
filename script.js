@@ -2,6 +2,10 @@ const API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
 import { auth, signOut, onAuthStateChanged } from './firebase.js';
 
+//llm API调用
+const API_KEY = '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'; // 替换为你的 Hugging Face API 密钥
+const API_URL = 'https://api-inference.huggingface.co/models/gpt2';
+
 // 用户登出函数
 async function logoutUser() {
     try {
@@ -41,7 +45,7 @@ async function loadNotes() {
     const response = await fetch(`${API_URL}/notes`, { signal: controller.signal }); // 发送 GET 请求获取笔记
     clearTimeout(timeoutId); // 清除超时
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`); // 检查响应状态
+      throw new Error(`HTTP error! status: ${response.status}`); // 检��响应状态
     }
     const notesData = await response.json(); // 解析响应数据
     console.log('Loaded notes:', notesData); // 打印调试信息
@@ -60,31 +64,32 @@ async function loadNotes() {
 async function addNote() {
   const noteInput = document.getElementById('noteInput').value; // 获取输入的笔记内容
   const timestamp = new Date().toISOString().slice(0, 19).replace('T', ' '); // 格式化时间戳
-
+  const feedbackContainer = document.getElementById('feedbackContainer'); // 获取反馈容器
   if (noteInput) {
     try {
-      const response = await fetch(`${API_URL}/notes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: noteInput, timestamp }) // 发送 POST 请求添加笔记
-      });
+        // 获取当前时间戳
+        const timestamp = new Date().toISOString();
 
-      if (!response.ok) { // 检查服务器响应状态码
-        throw new Error(`Failed to add note: ${response.status} ${response.statusText}`);
-      }
-      const newNote = await response.json(); // 解析响应数据
-      notes.push(newNote); // 将新笔记添加到笔记数组
-      document.getElementById('noteInput').value = ''; // 清空输入框
-      updateNoteList(); // 更新笔记列表
-      // 添加成功反馈信息，例如：alert('笔记添加成功！');
+        // 添加笔记到列表
+        const noteList = document.getElementById('noteList'); // 获取笔记列表
+        const newNote = document.createElement('li'); // 创建新的列表项
+        newNote.innerHTML = `<span>${noteInput}</span> <span class="timestamp">${formatTimestamp(timestamp)}</span>`; // 设置列表项的内容
+        noteList.appendChild(newNote); // 将列表项添加到笔记列表
+
+        // 获取反馈
+        const feedback = await getFeedback(noteInput); // 调用 Hugging Face API 获取反馈
+        const feedbackElement = document.createElement('p'); // 创建新的段落元素
+        feedbackElement.textContent = `Feedback: ${feedback}`;
+        feedbackContainer.appendChild(feedbackElement); // 将段落元素添加到反馈容器
+
+        // 清空输入框
+        document.getElementById('noteInput').value = ''; // 清空笔记输入框
     } catch (error) {
-      console.error('Error adding note:', error); // 错误处理
-      // 显示错误信息给用户，例如：alert('添加笔记失败，请稍后重试。');
+        console.error('Error getting feedback:', error);
+        feedbackContainer.textContent = 'Error getting feedback. Please try again later.'; // 显示错误信息
     }
   } else {
-    alert('笔记内容不能为空！'); // 输入内容为空时的提示
+    alert('Note content cannot be empty!'); // 提示用户输入内容不能为空
   }
 }
 
@@ -154,6 +159,19 @@ function updateNoteList(filteredNotes = notes, searchInput = '') {
     li.appendChild(noteText); // 将笔记文本添加到列表项
     li.appendChild(timestampDropdownContainer); // 将容器添加到列表项
 
+    // 创建反馈容器
+    const feedbackContainer = document.createElement('div'); // 创建反馈容器
+    feedbackContainer.className = 'feedback-container';
+
+    // 添加反馈信息
+    if (note.feedback) {
+      const feedbackElement = document.createElement('p'); // 创建反馈元素
+      feedbackElement.className = 'feedback';
+      feedbackElement.textContent = `Feedback: ${note.feedback}`; // 设置反馈内容
+      feedbackContainer.appendChild(feedbackElement); // 将反馈元素添加到反馈容器
+    }
+
+    li.appendChild(feedbackContainer); // 将反馈容器添加到列表项
     noteList.appendChild(li); // 将列表项添加到笔记列表
   });
 }
