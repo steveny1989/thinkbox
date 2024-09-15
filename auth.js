@@ -67,7 +67,7 @@ async function registerUser() {
     }
 }
 
-// 用户登录���数
+// 用户登录函数
 async function loginUser() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -130,14 +130,20 @@ async function syncUserToBackend(user, idToken) {
 // 绑定事件处理程序
 document.addEventListener('DOMContentLoaded', function() {
     const registerButton = document.getElementById('registerButton');
+    const loginButton = document.getElementById('loginButton');
+
     if (registerButton) {
         registerButton.addEventListener('click', registerUser);
     } else {
         console.error('Register button not found');
     }
-});
 
-document.getElementById('loginButton').addEventListener('click', loginUser);
+    if (loginButton) {
+        loginButton.addEventListener('click', loginUser);
+    } else {
+        console.error('Login button not found');
+    }
+});
 
 // 监听用户状态变化
 onAuthStateChanged(auth, (user) => {
