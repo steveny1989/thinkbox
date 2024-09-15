@@ -101,7 +101,7 @@ const noteOperations = {
         return;
       }
       console.log('User logged in, fetching notes...');
-      notes = await api.getNotes(); // 更新全局 notes 数组
+      const notes = await api.getNotes();
       console.log('Notes loaded successfully:', notes);
       updateNoteList(notes);
     } catch (error) {
@@ -116,8 +116,13 @@ const noteOperations = {
       const timestamp = getMySQLDateTime();
       const newNote = await api.addNote({ text, timestamp });
       console.log('New note added:', newNote);
+      
+      // 更新全局 notes 数组
       notes.unshift(newNote);
-      updateNoteList(notes); // 传递整个笔记数组
+      
+      // 调用 updateNoteList 并传递更新后的 notes 数组
+      updateNoteList(notes);
+      
       return newNote;
     } catch (error) {
       console.error('Error adding note:', error);
@@ -139,8 +144,8 @@ const noteOperations = {
 };
 
 // UI 更新函数
-function updateNoteList(notes) {
-  console.log('updateNoteList called with:', notes);
+function updateNoteList(notesToDisplay) {
+  console.log('updateNoteList called with:', notesToDisplay);
   const noteList = document.getElementById('noteList');
   const userEmailElement = document.getElementById('userEmail');
 
@@ -153,27 +158,18 @@ function updateNoteList(notes) {
 
   userEmailElement.textContent = auth.currentUser.email;
 
-  if (!notes || notes.length === 0) {
+  if (!notesToDisplay || notesToDisplay.length === 0) {
     console.log('No notes found, displaying empty state');
     noteList.innerHTML = '<li>No notes found. Create your first note!</li>';
     return;
   }
 
   console.log('Updating note list with received notes');
-  noteList.innerHTML = notes.map(note => `
+  noteList.innerHTML = notesToDisplay.map(note => `
     <li>
-      <div class="note-content">
-        <span>${note.text}</span>
-        <div class="timestamp-container">
-          <span class="timestamp">${formatTimestamp(note.timestamp)}</span>
-          <button class="delete-note" data-id="${note.id}">删除</button>
-        </div>
-        ${feedbacks[note.id] ? `
-          <div class="feedback-container">
-            <p class="feedback">ThinkBox: ${feedbacks[note.id]}</p>
-          </div>
-        ` : ''}
-      </div>
+      <span>${note.content}</span>
+      <span class="timestamp">${formatTimestamp(note.created_at)}</span>
+      <button class="delete-note" data-id="${note.id}">Delete</button>
     </li>
   `).join('');
 
