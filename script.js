@@ -69,8 +69,46 @@ const api = {
   },
 
   async deleteNote(id) {
-    const response = await fetch(`${BASE_API_URL}/notes/${id}`, { method: 'DELETE' });
-    if (!response.ok) throw new Error('Failed to delete note');
+    console.log(`deleteNote called with id: ${id}`);
+
+    // 检查用户是否已登录
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('Delete attempt with no user logged in');
+      throw new Error('No user logged in');
+    }
+    console.log(`User authenticated: ${user.uid}`);
+
+    try {
+      // 获取用户的身份令牌
+      console.log('Getting ID token...');
+      const idToken = await user.getIdToken();
+      console.log('ID token obtained');
+
+      // 发送DELETE请求到服务器
+      console.log(`Sending DELETE request to ${BASE_API_URL}/notes/${id}`);
+      const response = await fetch(`${BASE_API_URL}/notes/${id}`, {
+        method: 'DELETE', // 使用DELETE方法
+        headers: {
+          'Authorization': `Bearer ${idToken}` // 在请求头中包含身份令牌
+        }
+      });
+
+      console.log(`Delete request response status: ${response.status}`);
+
+      // 检查响应状态
+      if (!response.ok) {
+        // 如果响应不成功，获取错误信息
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error('Failed to delete note');
+      }
+
+      console.log(`Note with id ${id} successfully deleted`);
+    } catch (error) {
+      console.error('Error in deleteNote:', error);
+      throw error; // 重新抛出错误，以便调用者可以捕获并处理
+    }
   },
 
   async getFeedback(input) {
@@ -134,8 +172,7 @@ const noteOperations = {
     try {
       await api.deleteNote(id);
       notes = notes.filter(note => note.id !== id);
-      delete feedbacks[id];
-      updateNoteList();
+      updateNoteList(notes);
     } catch (error) {
       console.error('Error deleting note:', error);
       alert('Failed to delete note. Please try again.');
