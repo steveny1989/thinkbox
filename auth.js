@@ -9,8 +9,6 @@ async function registerUser() {
     const password = document.getElementById('registerPassword').value;
     const errorDiv = document.getElementById('registerError');
     const loadingDiv = document.getElementById('registerLoading');
-    const username = document.getElementById('registerUsername').value; // 确保这个 ID 与您的 HTML 匹配
-
 
     // 表单验证
     if (!email || !password) {
@@ -40,7 +38,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                username : username
+                username : user.displayName || user.email.split('@')[0] // 使用显示名称或邮箱前缀作为用户名
             })
         });
 
