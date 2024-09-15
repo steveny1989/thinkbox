@@ -40,7 +40,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                username = user.displayName || user.email.split('@')[0]
+                username : user.displayName || user.email.split('@')[0]
             })
         });
 
