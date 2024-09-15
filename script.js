@@ -183,22 +183,22 @@ const noteOperations = {
             notes = notes.filter(note => note.note_id !== noteId);
             updateNoteList(notes); // 更新 UI
             if (result.message.includes('not found') || result.message.includes('already deleted')) {
-              console.log(`笔记 ${noteId} 未找到或已被删除`);
-              // 可以选择是否向用户显示这个信息
-              // alert('笔记未找到或已被删除');
-          } else {
-              console.log('笔记删除成功');
-              // 可以选择向用户显示成功消息
-              // alert('笔记已成功删除');
-          }
-      } else {
-          console.warn('删除笔记失败:', result.message);
-          alert('删除笔记失败。' + result.message);
-      }
-  } catch (error) {
-      console.error('删除笔记时出错:', error);
-      alert('删除笔记失败。请重试。');
-  }
+                console.log(`笔记 ${noteId} 未找到或已被删除`);
+                // 可以选择是否向用户显示这个信息
+                // alert('笔记未找到或已被删除');
+            } else {
+                console.log('笔记删除成功');
+                // 可以选择向用户显示成功消息
+                // alert('笔记已成功删除');
+            }
+        } else {
+            console.warn('删除笔记失败:', result.message);
+            alert('删除笔记失败。' + result.message);
+        }
+    } catch (error) {
+        console.error('删除笔记时出错:', error);
+        alert('删除笔记失败。请重试。');
+    }
   }
 };
 
@@ -252,7 +252,89 @@ document.addEventListener('DOMContentLoaded', function() {
   // 获取元素
   const noteInput = document.getElementById('noteInput');
   const addNoteButton = document.getElementById('addNoteButton');
-  const se
+  const searchInput = document.getElementById('searchInput');
+  const noteList = document.getElementById('noteList');
+  const logoutButton = document.getElementById('logoutButton');
+  const userEmailSpan = document.getElementById('userEmail');
+ 
+  // 添加笔记按钮事件监听器
+  if (addNoteButton) {
+    addNoteButton.addEventListener('click', addNote);
+  } else {
+    console.error('Add Note button not found');
+  }
+
+    // 添加键盘事件监听器
+    noteInput.addEventListener('keydown', function(event) {
+      console.log('Keydown event triggered:', event.key);
+      // 检查是否按下了 Command+Enter (macOS) 或 Ctrl+Enter (其他操作系统)
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+          console.log('Command/Ctrl + Enter detected');
+          event.preventDefault(); // 阻止默认行为（换行）
+          addNote();
+      }
+  });
+
+  // 添加笔记的函数
+  function addNote() {
+    const noteText = noteInput.value.trim();
+    if (noteText) {
+      noteOperations.addNote(noteText).then(() => {
+        noteInput.value = ''; // 清空输入框
+      }).catch(error => {
+        console.error('Error adding note:', error);
+        alert('Failed to add note. Please try again.');
+      });
+    }
+  }
+
+  // 搜索输入事件监听器
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      // 搜索笔记的逻辑
+    });
+  }
+
+  // 登出按钮事件监听器
+  if (logoutButton) {
+    logoutButton.addEventListener('click', function() {
+      // 登出逻辑
+    });
+  }
+
+      // 为添加按钮添加点击事件监听器
+      if (addNoteButton) {
+        addNoteButton.addEventListener('click', addNote);
+        console.log('Click event listener added to Add Note button');
+    } else {
+        console.error('Add Note button not found');
+    }
+    
+  // 监督delete note的noteID
+  if (noteList) {
+    noteList.addEventListener('click', async function(e) {
+      if (e.target.classList.contains('delete-note')) {
+        const noteId = e.target.dataset.noteId;
+        console.log('Attempting to delete note with ID:', noteId);
+
+        if (!noteId) {
+          console.error('Note ID is undefined');
+          return;
+        }
+
+        try {
+          await noteOperations.deleteNote(noteId);
+          console.log(`Note ${noteId} deleted successfully`);
+        } catch (error) {
+          console.error('Error deleting note:', error);
+          alert('Failed to delete note. Please try again.');
+        }
+      }
+    });
+  } else {
+    console.error('Note list not found');
+  }
+}); // DOMContentLoaded 事件监听器结束
 
 // 监听认证状态变化
 onAuthStateChanged(auth, (user) => {
