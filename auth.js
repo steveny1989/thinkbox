@@ -43,8 +43,15 @@ async function registerUser() {
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to sync user with backend');
+            const errorText = await response.text();
+            let errorMessage;
+            try {
+                const errorData = JSON.parse(errorText);
+                errorMessage = errorData.error;
+            } catch (e) {
+                errorMessage = errorText;
+            }
+            throw new Error(errorMessage || 'Failed to sync user with backend');
         }
 
         const data = await response.json();
