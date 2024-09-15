@@ -239,6 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const noteList = document.getElementById('noteList');
   const logoutButton = document.getElementById('logoutButton');
   const userEmailSpan = document.getElementById('userEmail');
+  const registerButton = document.getElementById('registerButton'); // 新增这行
 
   // 添加笔记按钮事件监听器
   if (addNoteButton) {
