@@ -91,8 +91,6 @@ const api = {
           'Authorization': `Bearer ${idToken}`
         }
       });
-
-
         // 检查响应状态
         if (response.status === 200 || response.status === 404) {
           console.log(`笔记 ${noteId} 删除成功`);
@@ -180,7 +178,7 @@ const noteOperations = {
     try {
         const result = await api.deleteNote(noteId);
         if (result.success) {
-            console.log(`笔记 ${noteId} 删除处理完成`);
+            console.log(`笔记 ${noteId} 删除处理完成：${result.message}`);
             // 从本地 notes 数组中移除被删除的笔记
             notes = notes.filter(note => note.note_id !== noteId);
             updateNoteList(notes); // 更新 UI
@@ -261,16 +259,31 @@ document.addEventListener('DOMContentLoaded', function() {
  
   // 添加笔记按钮事件监听器
   if (addNoteButton) {
-    addNoteButton.addEventListener('click', async function() {
-      const noteText = noteInput.value.trim();
-      if (noteText) {
-        noteOperations.addNote(noteText).then(() => {
-          noteInput.value = ''; // 清空输入框
-        });
-      }
-    });
+    addNoteButton.addEventListener('click', addNote);
   } else {
     console.error('Add Note button not found');
+  }
+
+  // 添加键盘事件监听器
+  noteInput.addEventListener('keydown', function(event) {
+    // 检查是否按下了 Command+Enter (macOS) 或 Ctrl+Enter (其他操作系统)
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+      event.preventDefault(); // 阻止默认行为（换行）
+      addNote();
+    }
+  });
+
+  // 添加笔记的函数
+  function addNote() {
+    const noteText = noteInput.value.trim();
+    if (noteText) {
+      noteOperations.addNote(noteText).then(() => {
+        noteInput.value = ''; // 清空输入框
+      }).catch(error => {
+        console.error('Error adding note:', error);
+        alert('Failed to add note. Please try again.');
+      });
+    }
   }
 
   // 搜索输入事件监听器
