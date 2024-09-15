@@ -2,10 +2,6 @@ import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signO
 
 const BASE_API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
-// 辅助函数：从邮箱中提取用户名
-function extractNameFromEmail(email) {
-    return email.split('@')[0];
-}
 
 // 用户注册函数
 async function registerUser() {
@@ -13,6 +9,8 @@ async function registerUser() {
     const password = document.getElementById('registerPassword').value;
     const errorDiv = document.getElementById('registerError');
     const loadingDiv = document.getElementById('registerLoading');
+    const username = document.getElementById('registerUsername').value; // 确保这个 ID 与您的 HTML 匹配
+
 
     // 表单验证
     if (!email || !password) {
@@ -32,8 +30,6 @@ async function registerUser() {
         // 获取 ID token
         const idToken = await user.getIdToken();
 
-        const name = extractNameFromEmail(email);
-
         // 同步用户信息到后端
         const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
@@ -44,7 +40,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                name:name
+                username:username
             })
         });
 
@@ -87,7 +83,7 @@ async function loginUser() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const idToken = await user.getIdToken();
-        const name = extractNameFromEmail(email);
+        const username = user.displayName || user.email.split('@')[0] // 使用显示名称或邮箱前缀作为用户名
         console.log('User logged in:', user);
 
         // 获取 Firebase ID token
