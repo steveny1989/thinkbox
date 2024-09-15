@@ -119,7 +119,6 @@ async function syncUserToBackend(user, idToken) {
                 uid: user.uid,
                 email: user.email,
                 name:name
-                // 可以添加其他需要同步的用户信息
             })
         });
 
