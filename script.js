@@ -124,14 +124,21 @@ const noteOperations = {
         return;
       }
       console.log('User logged in, fetching notes...');
-      const notes = await api.getNotes();
-      console.log('Notes loaded successfully:', notes);
+      const fetchedNotes = await api.getNotes();
+      console.log('Notes loaded successfully:', fetchedNotes);
+      
+      // 更新全局 notes 数组
+      notes = fetchedNotes;
+      
       updateNoteList(notes);
     } catch (error) {
       console.error('Error loading notes:', error);
       alert('Failed to load notes. Please try again later.');
+      // 在错误情况下也更新UI，显示空列表
+      updateNoteList([]);
     }
   },
+
 
   async addNote(text) {
     console.log('addNote called with text:', text);
