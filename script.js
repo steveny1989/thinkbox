@@ -154,14 +154,14 @@ const noteOperations = {
   },
 
   async deleteNote(noteId) {
-    console.log(`deleteNote called with id: ${noteId}`); // 添加这行日志
+    console.log(`deleteNote 被调用，笔记 ID: ${noteId}`);
     if (!noteId) {
-      throw new Error('Invalid note ID');
+      throw new Error('无效的笔记 ID');
     }
 
     try {
       const token = await auth.currentUser.getIdToken();
-      console.log('Got auth token');
+      console.log('获取到认证令牌');
 
       const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
         method: 'DELETE',
@@ -169,17 +169,22 @@ const noteOperations = {
           'Authorization': `Bearer ${token}`
         }
       });
-      console.log('Delete request sent. Response status:', response.status);
+      console.log('删除请求已发送。响应状态:', response.status);
 
       if (!response.ok) {
+        if (response.status === 404) {
+          console.log(`笔记 ${noteId} 未找到或已被删除`);
+          return { success: true, message: '笔记未找到或已被删除' };
+        }
         const errorData = await response.json();
-        console.error('Server response:', errorData);
-        throw new Error(`Failed to delete note: ${errorData.error}`);
+        console.error('服务器响应:', errorData);
+        throw new Error(`删除笔记失败: ${errorData.error}`);
       }
 
-      console.log(`Note ${noteId} deleted successfully`);
+      console.log(`笔记 ${noteId} 删除成功`);
+      return { success: true };
     } catch (error) {
-      console.error('Error in deleteNote:', error);
+      console.error('deleteNote 中的错误:', error);
       throw error;
     }
   }
@@ -219,18 +224,25 @@ function updateNoteList(notesToDisplay) {
   document.querySelectorAll('.delete-note').forEach(button => {
     button.addEventListener('click', async function() {
       const noteId = this.dataset.noteId;
+      console.log('尝试删除笔记，ID:', noteId);
+
       if (!noteId) {
-        console.error('Note ID is undefined');
+        console.error('笔记 ID 未定义');
         return;
       }
 
       try {
-        await noteOperations.deleteNote(noteId);
-        console.log(`Note ${noteId} deleted successfully`);
-        this.closest('li').remove();
+        const result = await noteOperations.deleteNote(noteId);
+        if (result.success) {
+          console.log(`笔记 ${noteId} 删除处理完成`);
+          this.closest('li').remove();
+          if (result.message) {
+            console.log(result.message);
+          }
+        }
       } catch (error) {
-        console.error('Error deleting note:', error);
-        alert('Failed to delete note. Please try again.');
+        console.error('删除笔记时出错:', error);
+        alert('删除笔记失败。请重试。');
       }
     });
   });
