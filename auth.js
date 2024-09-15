@@ -82,12 +82,9 @@ async function loginUser() {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        const idToken = await user.getIdToken();
         const username = user.displayName || user.email.split('@')[0] // 使用显示名称或邮箱前缀作为用户名
         console.log('User logged in:', user);
 
-        // // 获取 Firebase ID token
-        // const idToken = await user.getIdToken();
 
         // 同步用户数据到后端
         await syncUserToBackend(user, idToken,username);
@@ -114,7 +111,7 @@ async function syncUserToBackend(user, idToken) {
             body: JSON.stringify({
                 uid: user.uid,
                 email: user.email,
-                username:username
+                username:user.displayName || user.email.split('@')[0] // 使用显示名称或邮箱前缀
             })
         });
 
