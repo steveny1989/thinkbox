@@ -260,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
         noteOperations.addNote(noteText).then(() => {
           noteInput.value = ''; // 清空输入框
         });
-
       }
     });
   } else {
@@ -280,29 +279,33 @@ document.addEventListener('DOMContentLoaded', function() {
       // 登出逻辑
     });
   }
-// 监督delete note的noteID
 
-noteList.addEventListener('click', async function(e) {
-  if (e.target.classList.contains('delete-note')) {
-    const noteId = e.target.dataset.noteId;
-    console.log('Attempting to delete note with ID:', noteId); // 添加这行日志
+  // 监督delete note的noteID
+  if (noteList) {
+    noteList.addEventListener('click', async function(e) {
+      if (e.target.classList.contains('delete-note')) {
+        const noteId = e.target.dataset.noteId;
+        console.log('Attempting to delete note with ID:', noteId);
 
-    if (!noteId) {
-      console.error('Note ID is undefined');
-      return;
-    }
+        if (!noteId) {
+          console.error('Note ID is undefined');
+          return;
+        }
 
-    try {
-      await noteOperations.deleteNote(noteId);
-      console.log(`Note ${noteId} deleted successfully`);
-      e.target.closest('li').remove();
-    } catch (error) {
-      console.error('Error deleting note:', error);
-      alert('Failed to delete note. Please try again.');
-    }
+        try {
+          await noteOperations.deleteNote(noteId);
+          console.log(`Note ${noteId} deleted successfully`);
+          e.target.closest('li').remove();
+        } catch (error) {
+          console.error('Error deleting note:', error);
+          alert('Failed to delete note. Please try again.');
+        }
+      }
+    });
+  } else {
+    console.error('Note list not found');
   }
-});
-});
+}); // DOMContentLoaded 事件监听器结束
 
   // 监听认证状态变化
   onAuthStateChanged(auth, (user) => {
@@ -337,7 +340,7 @@ async function loadNotes() {
     console.error('Error loading notes:', error);
     alert('Failed to load notes. Please try again later.');
   }
-}
+};
 
 // 用户登出函数
 async function logoutUser() {
@@ -348,7 +351,7 @@ async function logoutUser() {
     } catch (error) {
         console.error("Error signing out:", error);
     }
-}
+};
 
 // 绑定登出按钮事件处理程序
 document.getElementById('logoutButton').addEventListener('click', logoutUser);
