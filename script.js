@@ -168,13 +168,17 @@ const noteOperations = {
     }
   },
 
-  async deleteNote(id) {
-    console.log(`Attempting to delete note with id: ${id}`);
+  async deleteNote(noteId) {
+    console.log(`deleteNote called with id: ${noteId}`); // 添加这行日志
+    if (!noteId) {
+      throw new Error('Invalid note ID');
+    }
+
     try {
       const token = await auth.currentUser.getIdToken();
       console.log('Got auth token');
 
-      const response = await fetch(`${BASE_API_URL}/notes/${id}`, {
+      const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -188,8 +192,7 @@ const noteOperations = {
         throw new Error(`Failed to delete note: ${errorData.error}`);
       }
 
-      console.log(`Note ${id} deleted successfully`);
-      // 更新UI的代码
+      console.log(`Note ${noteId} deleted successfully`);
     } catch (error) {
       console.error('Error in deleteNote:', error);
       throw error;
@@ -223,13 +226,28 @@ function updateNoteList(notesToDisplay) {
     <li>
       <span>${note.content}</span>
       <span class="timestamp">${formatTimestamp(note.created_at)}</span>
-      <button class="delete-note" data-id="${note.id}">Delete</button>
+      <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
     </li>
   `).join('');
 
   // 添加删除按钮的事件监听器
   document.querySelectorAll('.delete-note').forEach(button => {
-    button.addEventListener('click', () => noteOperations.deleteNote(button.dataset.id));
+    button.addEventListener('click', async function() {
+      const noteId = this.dataset.noteId;
+      if (!noteId) {
+        console.error('Note ID is undefined');
+        return;
+      }
+
+      try {
+        await noteOperations.deleteNote(noteId);
+        console.log(`Note ${noteId} deleted successfully`);
+        this.closest('li').remove();
+      } catch (error) {
+        console.error('Error deleting note:', error);
+        alert('Failed to delete note. Please try again.');
+      }
+    });
   });
 }
 
@@ -262,30 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('Add Note button not found');
   }
-// 假设你有一个函数来获取所有的删除按钮
-const deleteButtons = document.querySelectorAll('.delete-note');
-
-// 为每个删除按钮添加点击事件监听器
-deleteButtons.forEach(button => {
-  button.addEventListener('click', async function() {
-    const noteId = this.dataset.id; // 从按钮的 data-id 属性获取 note ID
-    if (!noteId) {
-      console.error('Note ID is undefined');
-      return;
-    }
-
-    try {
-      await noteOperations.deleteNote(noteId);
-      console.log(`Note ${noteId} deleted successfully`);
-      // 处理成功删除的逻辑，例如从 UI 中移除该笔记
-      this.closest('li').remove(); // 假设每个笔记都在一个 li 元素中
-    } catch (error) {
-      console.error('Error deleting note:', error);
-      // 处理删除失败的逻辑，例如显示错误消息给用户
-      alert('Failed to delete note. Please try again.');
-    }
-  });
-});
 
   // 搜索输入事件监听器
   if (searchInput) {
@@ -300,6 +294,29 @@ deleteButtons.forEach(button => {
       // 登出逻辑
     });
   }
+// 监督delete note的noteID
+
+noteList.addEventListener('click', async function(e) {
+  if (e.target.classList.contains('delete-note')) {
+    const noteId = e.target.dataset.noteId;
+    console.log('Attempting to delete note with ID:', noteId); // 添加这行日志
+
+    if (!noteId) {
+      console.error('Note ID is undefined');
+      return;
+    }
+
+    try {
+      await noteOperations.deleteNote(noteId);
+      console.log(`Note ${noteId} deleted successfully`);
+      e.target.closest('li').remove();
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Failed to delete note. Please try again.');
+    }
+  }
+});
+});
 
   // 监听认证状态变化
   onAuthStateChanged(auth, (user) => {
