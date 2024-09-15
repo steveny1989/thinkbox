@@ -50,22 +50,30 @@ const api = {
       console.error('No user logged in');
       throw new Error('No user logged in');
     }
-    const idToken = await user.getIdToken();
-    const response = await fetch(`${BASE_API_URL}/notes`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${idToken}`
-      },
-      body: JSON.stringify(note)
-    });
-    console.log('API response status:', response.status);
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API error:', errorText);
-      throw new Error('Failed to add note');
+    try {
+      const idToken = await user.getIdToken();
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 秒超时
+      const response = await fetch(`${BASE_API_URL}/notes`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify(note),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error:', errorText);
+        throw new Error('Failed to add note');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error in addNote:', error);
+      throw error;
     }
-    return response.json();
   },
 
 // 在 API 对象中的删除笔记方法
@@ -150,7 +158,7 @@ const noteOperations = {
       // 更新全局 notes 数组
       notes.unshift(newNote);
       
-      // 调用 updateNoteList 并传递更新后的 notes 数组
+      // 调用 updateNoteList 并传递更新��的 notes 数组
       updateNoteList(notes);
       
       return newNote;
@@ -276,8 +284,9 @@ document.addEventListener('DOMContentLoaded', function() {
     addNoteButton.addEventListener('click', async function() {
       const noteText = noteInput.value.trim();
       if (noteText) {
-        await noteOperations.addNote(noteText);
-        noteInput.value = ''; // 清空输入框
+        noteOperations.addNote(noteText).then(() => {
+          noteInput.value = ''; // 清空输入框
+        });
       }
     });
   } else {
@@ -398,6 +407,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 });
+
 function getMySQLDateTime() {
   const now = new Date();
   const year = now.getFullYear();
