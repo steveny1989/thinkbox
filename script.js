@@ -302,7 +302,7 @@ noteList.addEventListener('click', async function(e) {
     }
   }
 });
-});
+}); // End of DOMContentLoaded event listener
 
   // 监听认证状态变化
   onAuthStateChanged(auth, (user) => {
