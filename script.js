@@ -326,7 +326,6 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     console.log("User is signed in:", user);
     try {
-      await syncUserToBackend(user);
       // 继续加载用户数据、笔记等
       noteOperations.loadNotes();
     } catch (error) {
