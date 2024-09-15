@@ -95,11 +95,14 @@ const api = {
 
         // 检查响应状态
         if (response.status === 200 || response.status === 204) {
-            console.log(`笔记 ${noteId} 删除成功`);
-            return { success: true, message: 'Note deleted successfully' };
-        }
+          console.log(`笔记 ${noteId} 删除成功`);
+          return { success: true, message: 'Note deleted successfully' };
+      } else if (response.status === 404) {
+          console.log(`笔记 ${noteId} 未找到，可能已被删除`);
+          return { success: true, message: 'Note not found, may have been already deleted' };
+      }
 
-        // 如果状态不是 200 或 204，尝试解析错误信息
+        // 如果状态不是 200 或 204或404，尝试解析错误信息
         const errorText = await response.text();
         console.warn('API warning response:', errorText);
         
