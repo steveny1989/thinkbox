@@ -76,33 +76,33 @@ const api = {
     }
   },
 
-// 在 API 对象中的删除笔记方法
-async deleteNote(noteId) {
-  console.log(`deleteNote called with id: ${noteId}`);
-  const user = auth.currentUser;
-  if (!user) {
-    console.error('Delete attempt with no user logged in');
-    throw new Error('No user logged in');
-  }
-  try {
-    const idToken = await user.getIdToken();
-    const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${idToken}`
-      }
-    });
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API error response:', errorText);
-      throw new Error('Failed to delete note');
+  async deleteNote(noteId) {
+    console.log(`deleteNote called with id: ${noteId}`);
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('Delete attempt with no user logged in');
+      throw new Error('No user logged in');
     }
-    console.log(`Note with id ${noteId} successfully deleted`);
-  } catch (error) {
-    console.error('Error in deleteNote:', error);
-    throw error;
-  }
-},
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error('Failed to delete note');
+      }
+      console.log(`Note with id ${noteId} successfully deleted`);
+      return { success: true, message: 'Note deleted successfully' };
+    } catch (error) {
+      console.error('Error in deleteNote:', error);
+      throw error;
+    }
+  },
 
   async getFeedback(input) {
     const response = await fetch(HF_API_URL, {
@@ -132,12 +132,8 @@ const noteOperations = {
         return;
       }
       console.log('User logged in, fetching notes...');
-      const fetchedNotes = await api.getNotes();
-      console.log('Notes loaded successfully:', fetchedNotes);
-      
-      // 更新全局 notes 数组
-      notes = fetchedNotes;
-      
+      notes = await api.getNotes(); // 更新全局 notes 数组
+      console.log('Notes loaded successfully:', notes);
       updateNoteList(notes);
     } catch (error) {
       console.error('Error loading notes:', error);
@@ -147,16 +143,15 @@ const noteOperations = {
     }
   },
 
-
   async addNote(text) {
     console.log('addNote called with text:', text);
     try {
-      const timestamp = getMySQLDateTime();
-      const newNote = await api.addNote({ content: text, timestamp });
+      const newNote = await api.addNote({ content: text });
       console.log('New note added:', newNote);
       
-      // 重新加载所有笔记
-      await this.loadNotes();
+      // 将新笔记添加到本地 notes 数组的开头
+      notes.unshift(newNote);
+      updateNoteList(notes); // 更新 UI
       
       return newNote;
     } catch (error) {
@@ -168,36 +163,23 @@ const noteOperations = {
   async deleteNote(noteId) {
     console.log(`deleteNote 被调用，笔记 ID: ${noteId}`);
     if (!noteId) {
-      throw new Error('无效的笔记 ID');
+        throw new Error('无效的笔记 ID');
     }
 
     try {
-      const token = await auth.currentUser.getIdToken();
-      console.log('获取到认证令牌');
-
-      const response = await fetch(`${BASE_API_URL}/notes/${noteId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
+        const result = await api.deleteNote(noteId);
+        if (result.success) {
+            console.log(`笔记 ${noteId} 删除处理完成`);
+            // 从本地 notes 数组中移除被删除的笔记
+            notes = notes.filter(note => note.note_id !== noteId);
+            updateNoteList(notes); // 更新 UI
+            if (result.message) {
+                console.log(result.message);
+            }
         }
-      });
-      console.log('删除请求已发送。响应状态:', response.status);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          console.log(`笔记 ${noteId} 未找到或已被删除`);
-          return { success: true, message: '笔记未找到或已被删除' };
-        }
-        const errorData = await response.json();
-        console.error('服务器响应:', errorData);
-        throw new Error(`删除笔记失败: ${errorData.error}`);
-      }
-
-      console.log(`笔记 ${noteId} 删除成功`);
-      return { success: true };
     } catch (error) {
-      console.error('deleteNote 中的错误:', error);
-      throw error;
+        console.error('删除笔记时出错:', error);
+        alert('删除笔记失败。请重试。');
     }
   }
 };
@@ -236,26 +218,7 @@ function updateNoteList(notesToDisplay) {
   document.querySelectorAll('.delete-note').forEach(button => {
     button.addEventListener('click', async function() {
       const noteId = this.dataset.noteId;
-      console.log('尝试删除笔记，ID:', noteId);
-
-      if (!noteId) {
-        console.error('笔记 ID 未定义');
-        return;
-      }
-
-      try {
-        const result = await noteOperations.deleteNote(noteId);
-        if (result.success) {
-          console.log(`笔记 ${noteId} 删除处理完成`);
-          this.closest('li').remove();
-          if (result.message) {
-            console.log(result.message);
-          }
-        }
-      } catch (error) {
-        console.error('删除笔记时出错:', error);
-        alert('删除笔记失败。请重试。');
-      }
+      await noteOperations.deleteNote(noteId);
     });
   });
 }
@@ -319,7 +282,6 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
           await noteOperations.deleteNote(noteId);
           console.log(`Note ${noteId} deleted successfully`);
-          e.target.closest('li').remove();
         } catch (error) {
           console.error('Error deleting note:', error);
           alert('Failed to delete note. Please try again.');
@@ -331,78 +293,57 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 }); // DOMContentLoaded 事件监听器结束
 
-  // 监听认证状态变化
-  onAuthStateChanged(auth, (user) => {
-    console.log('Auth state changed:', user ? 'User logged in' : 'No user');
-    if (user) {
-      loadNotes().then(() => {
-        console.log('Notes loading process completed');
-      }).catch(error => {
-        console.error('Error in loadNotes:', error);
-      });
-    } else {
-      updateNoteList([]); // 用户登出时清空笔记列表
-    }
-  });
-
-// 定义 loadNotes 函数
-async function loadNotes() {
-  console.log('loadNotes called');
-  try {
-    console.log('Checking auth state...');
-    const user = auth.currentUser;
-    if (!user) {
-      console.log('No user logged in, skipping note loading');
-      updateNoteList([]); // 更新UI以显示未登录状态
-      return;
-    }
-    console.log('User logged in, fetching notes...');
-    notes = await api.getNotes(); // 更新全局 notes 数组
-    console.log('Notes loaded successfully:', notes);
-    updateNoteList(notes);
-  } catch (error) {
-    console.error('Error loading notes:', error);
-    alert('Failed to load notes. Please try again later.');
+// 监听认证状态变化
+onAuthStateChanged(auth, (user) => {
+  console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+  if (user) {
+    noteOperations.loadNotes().then(() => {
+      console.log('Notes loading process completed');
+    }).catch(error => {
+      console.error('Error in loadNotes:', error);
+    });
+  } else {
+    updateNoteList([]); // 用户登出时清空笔记列表
   }
-};
+});
 
 // 用户登出函数
 async function logoutUser() {
-    try {
-        await signOut(auth);
-        console.log("User signed out");
-        window.location.href = "auth.html"; // 登出后跳转到登录页面
-    } catch (error) {
-        console.error("Error signing out:", error);
-    }
-};
+  try {
+    await signOut(auth);
+    console.log("User signed out");
+    window.location.href = "auth.html"; // 登出后跳转到登录页面
+  } catch (error) {
+    console.error("Error signing out:", error);
+  }
+}
 
 // 绑定登出按钮事件处理程序
 document.getElementById('logoutButton').addEventListener('click', logoutUser);
 
 // 监听用户状态变化
 onAuthStateChanged(auth, (user) => {
-    const userEmailElement = document.getElementById('userEmail');
-    if (user) {
-        console.log("User is signed in:", user);
-        userEmailElement.textContent = user.email; // 显示用户的邮箱
-        noteOperations.loadNotes(); // 加载用户的笔记
-    } else {
-        console.log("No user is signed in.");
-        userEmailElement.textContent = ''; // 清空用户邮箱
-        notes = []; // 清空笔记
-        updateNoteList(); // 更新 UI 以显示空的笔记列表
-        window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
-    }
+  const userEmailElement = document.getElementById('userEmail');
+  if (user) {
+    console.log("User is signed in:", user);
+    userEmailElement.textContent = user.email; // 显示用户的邮箱
+    noteOperations.loadNotes(); // 加载用户的笔记
+  } else {
+    console.log("No user is signed in.");
+    userEmailElement.textContent = ''; // 清空用户邮箱
+    notes = []; // 清空笔记
+    updateNoteList(); // 更新 UI 以显示空的笔记列表
+    window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
+  }
 });
 
 // 页面加载完成后检查用户状态
 document.addEventListener('DOMContentLoaded', (event) => {
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
-        }
-    });
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
+    }
+  });
 });
 
 function getMySQLDateTime() {
