@@ -94,10 +94,10 @@ const api = {
 
 
         // 检查响应状态
-        if (response.status === 200 || response.status === 204) {
+        if (response.status === 200 || response.status === 404) {
           console.log(`笔记 ${noteId} 删除成功`);
           return { success: true, message: 'Note deleted successfully' };
-      } else if (response.status === 404) {
+      } else if (response.status === 204) {
           console.log(`笔记 ${noteId} 未找到，可能已被删除`);
           return { success: true, message: 'Note not found, may have been already deleted' };
       }
