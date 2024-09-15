@@ -249,7 +249,7 @@ function formatTimestamp(timestamp) {
 // 事件监听器
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOMContentLoaded event fired');
-  // 获取元素
+  // 获取开是元素
   const noteInput = document.getElementById('noteInput');
   const addNoteButton = document.getElementById('addNoteButton');
   const searchInput = document.getElementById('searchInput');
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function() {
         addNoteButton.addEventListener('click', addNote);
         console.log('Click event listener added to Add Note button');
     } else {
-        console.error('Add Note button not found');
+        console.error('Add Notelist button not found');
     }
     
   // 监督delete note的noteID
