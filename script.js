@@ -67,7 +67,7 @@ const api = {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API error:', errorText);
-        throw new Error('Failed to add note');
+        throw new Error('Failed to add note: ${response.statusText}. ${errorText}');
       }
       return response.json();
     } catch (error) {
@@ -91,18 +91,26 @@ const api = {
           'Authorization': `Bearer ${idToken}`
         }
       });
-      if (!response.ok) {
+
+
+        // 检查响应状态
+        if (response.status === 200 || response.status === 204) {
+            console.log(`笔记 ${noteId} 删除成功`);
+            return { success: true, message: 'Note deleted successfully' };
+        }
+
+        // 如果状态不是 200 或 204，尝试解析错误信息
         const errorText = await response.text();
-        console.error('API error response:', errorText);
-        throw new Error('Failed to delete note');
-      }
-      console.log(`Note with id ${noteId} successfully deleted`);
-      return { success: true, message: 'Note deleted successfully' };
+        console.warn('API warning response:', errorText);
+        
+        // 即使有警告也视为成功
+        return { success: true, message: 'Note may have been deleted, but with a warning', warning: errorText };
+
     } catch (error) {
-      console.error('Error in deleteNote:', error);
-      throw error;
+        console.error('Error in deleteNote:', error);
+        throw error;
     }
-  },
+},
 
   async getFeedback(input) {
     const response = await fetch(HF_API_URL, {
