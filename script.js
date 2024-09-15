@@ -155,11 +155,8 @@ const noteOperations = {
       const newNote = await api.addNote({ content: text, timestamp });
       console.log('New note added:', newNote);
       
-      // 更新全局 notes 数组
-      notes.unshift(newNote);
-      
-      // 调用 updateNoteList 并传递更新��的 notes 数组
-      updateNoteList(notes);
+      // 重新加载所有笔记
+      await this.loadNotes();
       
       return newNote;
     } catch (error) {
