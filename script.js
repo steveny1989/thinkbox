@@ -302,6 +302,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+      // 为添加按钮添加点击事件监听器
+      if (addNoteButton) {
+        addNoteButton.addEventListener('click', addNote);
+        console.log('Click event listener added to Add Note button');
+    } else {
+        console.error('Add Note button not found');
+    }
+    
   // 监督delete note的noteID
   if (noteList) {
     noteList.addEventListener('click', async function(e) {
