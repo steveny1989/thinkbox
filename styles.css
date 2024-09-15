@@ -147,7 +147,7 @@ li {
 }
 
 .dropdown {
-  position: relative;
+  align-self: flex-end;
   display: inline-block;
 }
 
