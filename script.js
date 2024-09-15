@@ -183,22 +183,22 @@ const noteOperations = {
             notes = notes.filter(note => note.note_id !== noteId);
             updateNoteList(notes); // 更新 UI
             if (result.message.includes('not found') || result.message.includes('already deleted')) {
-                console.log(`笔记 ${noteId} 未找到或已被删除`);
-                // 可以选择是否向用户显示这个信息
-                // alert('笔记未找到或已被删除');
-            } else {
-                console.log('笔记删除成功');
-                // 可以选择向用户显示成功消息
-                // alert('笔记已成功删除');
-            }
-        } else {
-            console.warn('删除笔记失败:', result.message);
-            alert('删除笔记失败。' + result.message);
-        }
-    } catch (error) {
-        console.error('删除笔记时出错:', error);
-        alert('删除笔记失败。请重试。');
-    }
+              console.log(`笔记 ${noteId} 未找到或已被删除`);
+              // 可以选择是否向用户显示这个信息
+              // alert('笔记未找到或已被删除');
+          } else {
+              console.log('笔记删除成功');
+              // 可以选择向用户显示成功消息
+              // alert('笔记已成功删除');
+          }
+      } else {
+          console.warn('删除笔记失败:', result.message);
+          alert('删除笔记失败。' + result.message);
+      }
+  } catch (error) {
+      console.error('删除笔记时出错:', error);
+      alert('删除笔记失败。请重试。');
+  }
   }
 };
 
