@@ -113,7 +113,8 @@ const noteOperations = {
   async addNote(text) {
     console.log('addNote called with text:', text);
     try {
-      const newNote = await api.addNote({ text, timestamp: new Date().toISOString() });
+      const timestamp = getMySQLDateTime();
+      const newNote = await api.addNote({ text, timestamp });
       console.log('New note added:', newNote);
       notes.unshift(newNote);
       updateNoteList();
