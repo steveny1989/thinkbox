@@ -40,7 +40,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                username : user.displayName || user.email.split('@')[0]
+                username : username
             })
         });
 
@@ -114,7 +114,7 @@ async function syncUserToBackend(user, idToken) {
             body: JSON.stringify({
                 uid: user.uid,
                 email: user.email,
-                username:user.displayName || user.email.split('@')[0]
+                username:username
             })
         });
 
