@@ -74,13 +74,6 @@ async function loginUser() {
     const errorDiv = document.getElementById('loginError');
     const loadingDiv = document.getElementById('loginLoading');
 
-    // 表单验证
-    if (!email || !password) {
-        errorDiv.textContent = "请填写所有字段";
-        errorDiv.style.display = "block";
-        return;
-    }
-
     errorDiv.style.display = "none";
     loadingDiv.style.display = "block";
 
@@ -92,30 +85,46 @@ async function loginUser() {
         // 获取 Firebase ID token
         const idToken = await user.getIdToken();
 
-        // 从后端获取用户数据
-        const response = await fetch(`https://178.128.81.19:3001/users/${user.uid}`, {
-            headers: {
-                'Authorization': `Bearer ${idToken}`
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`Failed to fetch user data: ${errorData.error}`);
-        }
-
-        const userData = await response.json();
-        console.log('User data from backend:', userData);
-
-        // ... 处理成功登录 ...
+        // 同步用户数据到后端
+        await syncUserToBackend(user, idToken);
 
         alert("登录成功！");
         window.location.href = "index.html";
     } catch (error) {
         console.error("Error logging in user:", error);
-        // ... 错误处理 ...
+        errorDiv.textContent = "登录失败：" + error.message;
+        errorDiv.style.display = "block";
     } finally {
         loadingDiv.style.display = "none";
+    }
+}
+
+async function syncUserToBackend(user, idToken) {
+    try {
+        const response = await fetch('https://178.128.81.19:3001/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                uid: user.uid,
+                email: user.email
+                // 可以添加其他需要同步的用户信息
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to sync user data: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('User data synced with backend:', result);
+    } catch (error) {
+        console.error('Error syncing user data:', error);
+        // 这里可以选择是否要抛出错误。如果不抛出，用户仍可以继续使用应用
+        // throw error;
     }
 }
 
