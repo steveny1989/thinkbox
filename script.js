@@ -322,18 +322,20 @@ async function logoutUser() {
 document.getElementById('logoutButton').addEventListener('click', logoutUser);
 
 // 监听用户状态变化
-onAuthStateChanged(auth, (user) => {
-  const userEmailElement = document.getElementById('userEmail');
+onAuthStateChanged(auth, async (user) => {
   if (user) {
     console.log("User is signed in:", user);
-    userEmailElement.textContent = user.email; // 显示用户的邮箱
-    noteOperations.loadNotes(); // 加载用户的笔记
+    try {
+      await syncUserToOurDatabase(user);
+      // 继续加载用户数据、笔记等
+      noteOperations.loadNotes();
+    } catch (error) {
+      console.error("Error syncing user data:", error);
+      // 处理同步错误，但不影响用户使用应用
+    }
   } else {
     console.log("No user is signed in.");
-    userEmailElement.textContent = ''; // 清空用户邮箱
-    notes = []; // 清空笔记
-    updateNoteList(); // 更新 UI 以显示空的笔记列表
-    window.location.href = "auth.html"; // 用户未登录，跳转到登录页面
+    // 处理用户登出逻辑
   }
 });
 
