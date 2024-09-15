@@ -40,7 +40,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                username:username
+                username = user.displayName || user.email.split('@')[0]
             })
         });
 
@@ -90,7 +90,7 @@ async function loginUser() {
         const idToken = await user.getIdToken();
 
         // 同步用户数据到后端
-        await syncUserToBackend(user, idToken,name);
+        await syncUserToBackend(user, idToken,username);
 
         alert("登录成功！");
         window.location.href = "index.html";
@@ -114,7 +114,7 @@ async function syncUserToBackend(user, idToken) {
             body: JSON.stringify({
                 uid: user.uid,
                 email: user.email,
-                name:name
+                username:user.displayName || user.email.split('@')[0]
             })
         });
 
