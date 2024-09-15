@@ -146,3 +146,5 @@ onAuthStateChanged(auth, (user) => {
         // 用户未登录，可以在这里执行未登录时的操作
     }
 });
+
+export { syncUserToBackend };

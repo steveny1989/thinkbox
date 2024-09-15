@@ -1,6 +1,7 @@
 const BASE_API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
 import { auth, signOut, onAuthStateChanged } from './firebase.js';
+import { syncUserToBackend } from './auth.js';
 
 // Hugging Face API 相关设置
 const HF_API_KEY = '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';
