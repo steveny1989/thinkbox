@@ -2,6 +2,11 @@ import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signO
 
 const BASE_API_URL = 'https://178.128.81.19:3001'; // 定义 API 基础 URL
 
+// 辅助函数：从邮箱中提取用户名
+function extractNameFromEmail(email) {
+    return email.split('@')[0];
+}
+
 // 用户注册函数
 async function registerUser() {
     const email = document.getElementById('registerEmail').value;
@@ -27,6 +32,8 @@ async function registerUser() {
         // 获取 ID token
         const idToken = await user.getIdToken();
 
+        const name = extractNameFromEmail(email);
+
         // 同步用户信息到后端
         const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
@@ -37,8 +44,7 @@ async function registerUser() {
             body: JSON.stringify({
                 email: user.email,
                 uid: user.uid,
-                // 如果你想包含用户名，可以添加一个输入字段并在这里包含
-                // name: document.getElementById('registerName').value
+                name:name
             })
         });
 
@@ -80,13 +86,15 @@ async function loginUser() {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        const idToken = await user.getIdToken();
+        const name = extractNameFromEmail(email);
         console.log('User logged in:', user);
 
         // 获取 Firebase ID token
         const idToken = await user.getIdToken();
 
         // 同步用户数据到后端
-        await syncUserToBackend(user, idToken);
+        await syncUserToBackend(user, idToken,name);
 
         alert("登录成功！");
         window.location.href = "index.html";
@@ -109,7 +117,8 @@ async function syncUserToBackend(user, idToken) {
             },
             body: JSON.stringify({
                 uid: user.uid,
-                email: user.email
+                email: user.email,
+                name:name
                 // 可以添加其他需要同步的用户信息
             })
         });
