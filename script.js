@@ -101,7 +101,7 @@ const noteOperations = {
         return;
       }
       console.log('User logged in, fetching notes...');
-      const notes = await api.getNotes();
+      notes = await api.getNotes(); // 更新全局 notes 数组
       console.log('Notes loaded successfully:', notes);
       updateNoteList(notes);
     } catch (error) {
@@ -117,7 +117,7 @@ const noteOperations = {
       const newNote = await api.addNote({ text, timestamp });
       console.log('New note added:', newNote);
       notes.unshift(newNote);
-      updateNoteList();
+      updateNoteList(notes); // 传递整个笔记数组
       return newNote;
     } catch (error) {
       console.error('Error adding note:', error);
@@ -153,7 +153,7 @@ function updateNoteList(notes) {
 
   userEmailElement.textContent = auth.currentUser.email;
 
-  if (notes.length === 0) {
+  if (!notes || notes.length === 0) {
     console.log('No notes found, displaying empty state');
     noteList.innerHTML = '<li>No notes found. Create your first note!</li>';
     return;
@@ -254,7 +254,7 @@ async function loadNotes() {
       return;
     }
     console.log('User logged in, fetching notes...');
-    const notes = await api.getNotes();
+    notes = await api.getNotes(); // 更新全局 notes 数组
     console.log('Notes loaded successfully:', notes);
     updateNoteList(notes);
   } catch (error) {
