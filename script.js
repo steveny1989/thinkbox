@@ -264,13 +264,15 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('Add Note button not found');
   }
 
-  // 添加键盘事件监听器
-  noteInput.addEventListener('keydown', function(event) {
-    // 检查是否按下了 Command+Enter (macOS) 或 Ctrl+Enter (其他操作系统)
-    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
-      event.preventDefault(); // 阻止默认行为（换行）
-      addNote();
-    }
+    // 添加键盘事件监听器
+    noteInput.addEventListener('keydown', function(event) {
+      console.log('Keydown event triggered:', event.key);
+      // 检查是否按下了 Command+Enter (macOS) 或 Ctrl+Enter (其他操作系统)
+      if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+          console.log('Command/Ctrl + Enter detected');
+          event.preventDefault(); // 阻止默认行为（换行）
+          addNote();
+      }
   });
 
   // 添加笔记的函数
