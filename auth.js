@@ -10,6 +10,29 @@ async function registerUser() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
+        // 直接在这里同步用户信息到后端
+        const idToken = await user.getIdToken();
+        const response = await fetch('https://178.128.81.19:3001/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                username: user.displayName || user.email.split('@')[0]
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API error:', errorText);
+            console.warn('Failed to sync user data after registration, but allowing process to continue');
+        } else {
+            const data = await response.json();
+            console.log('User synced successfully after registration:', data);
+        }
         // 注册成功后可能需要进行的操作，比如跳转到主页
         window.location.href = 'index.html';
     } catch (error) {
@@ -28,6 +51,32 @@ async function loginUser() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
+        
+        // 直接在这里同步用户信息到后端
+        const idToken = await user.getIdToken();
+        const response = await fetch('https://178.128.81.19:3001/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                uid: user.uid,
+                email: user.email,
+                username: user.displayName || user.email.split('@')[0]
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API error:', errorText);
+            // 即使同步失败，我们也允许用户继续使用应用
+            console.warn('Failed to sync user data, but allowing login to proceed');
+        } else {
+            const data = await response.json();
+            console.log('User synced successfully:', data);
+        }
+
         // 登录成功后跳转到主页
         window.location.href = 'index.html';
     } catch (error) {
