@@ -169,13 +169,30 @@ const noteOperations = {
   },
 
   async deleteNote(id) {
+    console.log(`Attempting to delete note with id: ${id}`);
     try {
-      await api.deleteNote(id);
-      notes = notes.filter(note => note.id !== id);
-      updateNoteList(notes);
+      const token = await auth.currentUser.getIdToken();
+      console.log('Got auth token');
+
+      const response = await fetch(`${BASE_API_URL}/notes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log('Delete request sent. Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server response:', errorData);
+        throw new Error(`Failed to delete note: ${errorData.error}`);
+      }
+
+      console.log(`Note ${id} deleted successfully`);
+      // 更新UI的代码
     } catch (error) {
-      console.error('Error deleting note:', error);
-      alert('Failed to delete note. Please try again.');
+      console.error('Error in deleteNote:', error);
+      throw error;
     }
   }
 };
@@ -245,6 +262,30 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('Add Note button not found');
   }
+// 假设你有一个函数来获取所有的删除按钮
+const deleteButtons = document.querySelectorAll('.delete-note');
+
+// 为每个删除按钮添加点击事件监听器
+deleteButtons.forEach(button => {
+  button.addEventListener('click', async function() {
+    const noteId = this.dataset.id; // 从按钮的 data-id 属性获取 note ID
+    if (!noteId) {
+      console.error('Note ID is undefined');
+      return;
+    }
+
+    try {
+      await noteOperations.deleteNote(noteId);
+      console.log(`Note ${noteId} deleted successfully`);
+      // 处理成功删除的逻辑，例如从 UI 中移除该笔记
+      this.closest('li').remove(); // 假设每个笔记都在一个 li 元素中
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      // 处理删除失败的逻辑，例如显示错误消息给用户
+      alert('Failed to delete note. Please try again.');
+    }
+  });
+});
 
   // 搜索输入事件监听器
   if (searchInput) {
