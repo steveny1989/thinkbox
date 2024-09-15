@@ -137,7 +137,7 @@ const noteOperations = {
     console.log('addNote called with text:', text);
     try {
       const timestamp = getMySQLDateTime();
-      const newNote = await api.addNote({ text, timestamp });
+      const newNote = await api.addNote({ content: text, timestamp });
       console.log('New note added:', newNote);
       
       // 更新全局 notes 数组
@@ -266,12 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 添加笔记按钮事件监听器
   if (addNoteButton) {
-    addNoteButton.addEventListener('click', function() {
+    addNoteButton.addEventListener('click', async function() {
       const noteText = noteInput.value.trim();
       if (noteText) {
-        noteOperations.addNote(noteText).then(() => {
-          noteInput.value = ''; // 清空输入框
-        });
+        await noteOperations.addNote(noteText);
+        noteInput.value = ''; // 清空输入框
       }
     });
   } else {
