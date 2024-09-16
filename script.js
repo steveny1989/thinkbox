@@ -241,29 +241,30 @@ function updateNoteList(notesToDisplay) {
   </li>
 `).join('');
 
-// // 在生成笔记列表后添加这段代码
-// noteList.querySelectorAll('.dropdown-trigger').forEach(trigger => {
-//   trigger.addEventListener('click', function(e) {
-//     e.stopPropagation();
-//     this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';
-//   });
-// });
-
-// // 点击页面其他地方时关闭下拉菜单
-// document.addEventListener('click', function() {
-//   document.querySelectorAll('.dropdown-content').forEach(content => {
-//     content.style.display = 'none';
-//   });
-// });
-
 // 在生成笔记列表后添加这段代码
 noteList.querySelectorAll('.dropdown').forEach(dropdown => {
+  let timeoutId;
+
   dropdown.addEventListener('mouseenter', function() {
+    clearTimeout(timeoutId);
     this.querySelector('.dropdown-content').style.display = 'block';
   });
 
   dropdown.addEventListener('mouseleave', function() {
-    this.querySelector('.dropdown-content').style.display = 'none';
+    const dropdownContent = this.querySelector('.dropdown-content');
+    timeoutId = setTimeout(() => {
+      dropdownContent.style.display = 'none';
+    }, 200); // 延迟 200 毫秒隐藏
+  });
+
+  this.querySelector('.dropdown-content').addEventListener('mouseenter', function() {
+    clearTimeout(timeoutId);
+  });
+
+  this.querySelector('.dropdown-content').addEventListener('mouseleave', function() {
+    timeoutId = setTimeout(() => {
+      this.style.display = 'none';
+    }, 200); // 延迟 200 毫秒隐藏
   });
 });
 
