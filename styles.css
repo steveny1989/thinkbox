@@ -274,3 +274,53 @@ align-self: flex-end;
   color: #007BFF; /* 使用主题蓝色 */
 }
 
+.note-item {
+  margin-bottom: 10px;
+}
+
+.note-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.note-content {
+  flex-grow: 1;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+.note-text {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-timestamp {
+  display: block;
+  font-size: 12px;
+  color: #666;
+}
+
+.delete-note {
+  padding: 5px 10px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  white-space: nowrap;
+}
+
+.delete-note:hover {
+  background-color: #ff3333;
+}
+

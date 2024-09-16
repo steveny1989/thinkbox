@@ -225,12 +225,14 @@ function updateNoteList(notesToDisplay) {
 
   console.log('Updating note list with received notes');
   noteList.innerHTML = notesToDisplay.map(note => `
-  <li class="note-item">
-    <div class="note-content">
-      <span class="note-text">${note.content}</span>
-      <span class="note-timestamp">${formatTimestamp(note.created_at)}</span>
+<li class="note-item">
+    <div class="note-container">
+      <div class="note-content">
+        <span class="note-text">${note.content}</span>
+        <span class="note-timestamp">${formatTimestamp(note.created_at)}</span>
+      </div>
+      <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
     </div>
-    <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
   </li>
 `).join('');
 
