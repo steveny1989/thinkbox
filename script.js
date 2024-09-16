@@ -254,7 +254,7 @@ noteList.querySelectorAll('.dropdown').forEach(dropdown => {
     const dropdownContent = this.querySelector('.dropdown-content');
     timeoutId = setTimeout(() => {
       dropdownContent.style.display = 'none';
-    }, 200); // 延迟 200 毫秒隐藏
+    }, 500); // 延迟 500 毫秒隐藏
   });
 
   this.querySelector('.dropdown-content').addEventListener('mouseenter', function() {
@@ -264,7 +264,7 @@ noteList.querySelectorAll('.dropdown').forEach(dropdown => {
   this.querySelector('.dropdown-content').addEventListener('mouseleave', function() {
     timeoutId = setTimeout(() => {
       this.style.display = 'none';
-    }, 200); // 延迟 200 毫秒隐藏
+    }, 500); // 延迟 500 毫秒隐藏
   });
 });
 
