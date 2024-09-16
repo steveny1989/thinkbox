@@ -241,32 +241,21 @@ function updateNoteList(notesToDisplay) {
   </li>
 `).join('');
 
-// 在生成笔记列表后添加这段代码
-noteList.querySelectorAll('.dropdown').forEach(dropdown => {
-  let timeoutId;
+// // 在生成笔记列表后添加这段代码
+// noteList.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+//   trigger.addEventListener('click', function(e) {
+//     e.stopPropagation();
+//     this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';
+//   });
+// });
 
-  dropdown.addEventListener('mouseenter', function() {
-    clearTimeout(timeoutId);
-    this.querySelector('.dropdown-content').style.display = 'block';
-  });
+// // 点击页面其他地方时关闭下拉菜单
+// document.addEventListener('click', function() {
+//   document.querySelectorAll('.dropdown-content').forEach(content => {
+//     content.style.display = 'none';
+//   });
+// });
 
-  dropdown.addEventListener('mouseleave', function() {
-    const dropdownContent = this.querySelector('.dropdown-content');
-    timeoutId = setTimeout(() => {
-      dropdownContent.style.display = 'none';
-    }, 1000); // 延迟 500 毫秒隐藏
-  });
-
-  this.querySelector('.dropdown-content').addEventListener('mouseenter', function() {
-    clearTimeout(timeoutId);
-  });
-
-  this.querySelector('.dropdown-content').addEventListener('mouseleave', function() {
-    timeoutId = setTimeout(() => {
-      this.style.display = 'none';
-    }, 1000); // 延迟 500 毫秒隐藏
-  });
-});
 
   // 添加删除按钮的事件监听器
   document.querySelectorAll('.delete-note').forEach(button => {
