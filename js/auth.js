@@ -2,16 +2,21 @@ import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from
 
 // 用户注册函数
 async function registerUser() {
+    // 获取用户输入的邮箱和密码
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     const errorDiv = document.getElementById('registerError');
 
     try {
+        // 使用 Firebase 认证创建新用户
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User registered:', user);
-        // 直接在这里同步用户信息到后端
+
+        // 获取用户的 ID 令牌
         const idToken = await user.getIdToken();
+
+        // 将用户信息同步到后端
         const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
             headers: {
@@ -25,6 +30,7 @@ async function registerUser() {
             })
         });
 
+        // 检查同步是否成功
         if (!response.ok) {
             const errorText = await response.text();
             console.error('API error:', errorText);
@@ -33,7 +39,8 @@ async function registerUser() {
             const data = await response.json();
             console.log('User synced successfully after registration:', data);
         }
-        // 注册成功后可能需要进行的操作，比如跳转到主页
+
+        // 注册成功后跳转到主页
         window.location.href = 'index.html';
     } catch (error) {
         console.error('Registration error:', error);
@@ -43,17 +50,21 @@ async function registerUser() {
 
 // 用户登录函数
 async function loginUser() {
+    // 获取用户输入的邮箱和密码
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     const errorDiv = document.getElementById('loginError');
 
     try {
+        // 使用 Firebase 认证登录用户
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         console.log('User logged in:', user);
-        
-        // 直接在这里同步用户信息到后端
+
+        // 获取用户的 ID 令牌
         const idToken = await user.getIdToken();
+
+        // 将用户信息同步到后端
         const response = await fetch('https://178.128.81.19:3001/users', {
             method: 'POST',
             headers: {
@@ -67,10 +78,10 @@ async function loginUser() {
             })
         });
 
+        // 检查同步是否成功
         if (!response.ok) {
             const errorText = await response.text();
             console.error('API error:', errorText);
-            // 即使同步失败，我们也允许用户继续使用应用
             console.warn('Failed to sync user data, but allowing login to proceed');
         } else {
             const data = await response.json();
@@ -90,10 +101,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerButton = document.getElementById('registerButton');
     const loginButton = document.getElementById('loginButton');
 
+    // 为注册按钮绑定点击事件
     if (registerButton) {
         registerButton.addEventListener('click', registerUser);
     }
 
+    // 为登录按钮绑定点击事件
     if (loginButton) {
         loginButton.addEventListener('click', loginUser);
     }
