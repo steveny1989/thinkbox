@@ -147,50 +147,35 @@ li {
 }
 
 .dropdown {
-align-self: flex-end;
-  display: inline-block;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .dropdown-button {
-  font-family: 'Noto Sans SC', sans-serif; /* 使用思源黑体 */
-  background: none; /* 移除背景 */
-  color: #007BFF; /* 蓝色 */
+  background: none;
   border: none;
-  font-size: 0.25rem; /* 调整字体大小 */
+  font-size: 20px;
   cursor: pointer;
-  padding: 0; /* 移除内边距 */
-  margin: 0; /* 移除外边距 */
-  transition: color 0.3s; /* 添加过渡效果 */
-  margin-left: 10px; /* 增加按钮和时间戳之间的间距 */
-}
-
-.dropdown-button::after {
-  content: '⋮'; /* 使用竖向省略号 */
-  font-size: 0.375rem; /* 调整字体大小 */
-  color: #007BFF; /* 蓝色 */
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1; /* 确保竖向省略号垂直居中 */
+  padding: 5px 10px;
 }
 
 .dropdown-content {
-  display: none; /* 默认隐藏 */
+  display: none;
   position: absolute;
   right: 0;
-  background-color: #fff;
-  min-width: 6.25rem; /* 100px */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2); /* 添加阴影 */
+  top: 100%;
+  background-color: #f9f9f9;
+  min-width: 120px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 1;
-  border-radius: 0.3125rem; /* 5px */
-  border: 0.0625rem solid #ccc; /* 1px */
 }
 
 .dropdown-content a {
   color: black;
-  padding: 0.625rem; /* 10px */
+  padding: 12px 16px;
   text-decoration: none;
   display: block;
-  border-radius: 0.3125rem; /* 5px */
 }
 
 .dropdown-content a:hover {
@@ -198,7 +183,7 @@ align-self: flex-end;
 }
 
 .dropdown:hover .dropdown-content {
-  display: block; /* 悬停时显示 */
+  display: block;
 }
 
 .edit-input {
