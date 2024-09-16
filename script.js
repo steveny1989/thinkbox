@@ -225,16 +225,36 @@ function updateNoteList(notesToDisplay) {
 
   console.log('Updating note list with received notes');
   noteList.innerHTML = notesToDisplay.map(note => `
-<li class="note-item">
+  <li class="note-item">
     <div class="note-container">
       <div class="note-content">
         <span class="note-text">${note.content}</span>
         <span class="note-timestamp">${formatTimestamp(note.created_at)}</span>
       </div>
-      <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
+      <div class="dropdown">
+        <button class="dropdown-button">...</button>
+        <div class="dropdown-content">
+          <a href="#" class="delete-note" data-note-id="${note.note_id}">Delete</a>
+        </div>
+      </div>
     </div>
   </li>
 `).join('');
+
+// 在生成笔记列表后添加这段代码
+noteList.querySelectorAll('.dropdown-button').forEach(button => {
+  button.addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';
+  });
+});
+
+// 点击页面其他地方时关闭下拉菜单
+document.addEventListener('click', function() {
+  document.querySelectorAll('.dropdown-content').forEach(content => {
+    content.style.display = 'none';
+  });
+});
 
   // 添加删除按钮的事件监听器
   document.querySelectorAll('.delete-note').forEach(button => {
