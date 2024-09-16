@@ -270,7 +270,10 @@ function updateNoteList(notesToDisplay) {
 `).join('');
 
   // 在生成笔记列表后添加这段代码
-  noteList.querySelectorAll('.dropdown').forEach(dropdown => {
+  const dropdowns = noteList.querySelectorAll('.dropdown');
+  console.log('Found dropdowns:', dropdowns);
+
+  dropdowns.forEach(dropdown => {
     let timeoutId;
 
     dropdown.addEventListener('mouseenter', function() {
@@ -305,7 +308,10 @@ function updateNoteList(notesToDisplay) {
   });
 
   // 添加删除按钮的事件监听器
-  document.querySelectorAll('.delete-note').forEach(button => {
+  const deleteButtons = document.querySelectorAll('.delete-note');
+  console.log('Found delete buttons:', deleteButtons);
+
+  deleteButtons.forEach(button => {
     button.addEventListener('click', async function() {
       const noteId = this.dataset.noteId;
       await noteOperations.deleteNote(noteId);
@@ -363,17 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // 搜索输入事件监听器
   if (searchInput) {
     searchInput.addEventListener('input', function() {
-      const query = searchInput.value.trim();
-      if (query) {
-        noteOperations.searchNotes(query).then(matchingNotes => {
-          updateNoteList(matchingNotes);
-        }).catch(error => {
-          console.error('Error searching notes:', error);
-          alert('Failed to search notes. Please try again.');
-        });
-      } else {
-        noteOperations.loadNotes();
-      }
+      // 搜索笔记的逻辑
     });
   }
 
