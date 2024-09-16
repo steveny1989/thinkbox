@@ -1,6 +1,5 @@
 // 从 firebase.js 导入 Firebase 认证实例
-import { auth } from './firebase.js';
-// 从 noteOperations.js 导入笔记操作对象
+import { auth, onAuthStateChanged } from './firebase.js';
 import noteOperations from './noteOperations.js';
 
 // 更新笔记列表的函数
