@@ -1,7 +1,18 @@
 // 从 firebase.js 导入 Firebase 认证实例
 import { auth, onAuthStateChanged, signOut } from './firebase.js';
 import noteOperations from './noteOperations.js';
-import { updateNoteList } from './ui.js'; // 确保只导入一次
+
+
+// 定义 updateNoteList 函数
+export function updateNoteList(notes) {
+  const noteList = document.getElementById('noteList');
+  noteList.innerHTML = '';
+  notes.forEach(note => {
+    const li = document.createElement('li');
+    li.textContent = note.content;
+    noteList.appendChild(li);
+  });
+}
 
 // 页面加载完成后执行的代码
 document.addEventListener('DOMContentLoaded', function() {
