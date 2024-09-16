@@ -329,7 +329,7 @@ li {
   padding: 6px 10px; /* 减小内边距 */
   text-decoration: none;
   display: block;
-  font-size: 10px; /* 设置非常小的字体大小 */
+  font-size: 14px; /* 设置非常小的字体大小 */
   text-align: center; /* 文本居中 */
   transition: background-color 0.2s, color 0.2s;
 }
