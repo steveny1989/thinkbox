@@ -170,7 +170,7 @@ async generateFeedback(noteId, content) {
   }
 },
 
-// 获取反馈
+// 获取的反馈
 async getFeedback(noteId) {
   console.log('API getFeedback called with noteId:', noteId);
   const user = auth.currentUser;
