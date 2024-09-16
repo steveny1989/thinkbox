@@ -366,10 +366,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // 搜索输入事件监听器
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
+// 搜索输入事件监听器
+if (searchInput) {
+  searchInput.addEventListener('input', function() {
+    const query = searchInput.value.trim();
+    if (query) {
+      noteOperations.searchNotes(query).then(matchingNotes => {
+        updateNoteList(matchingNotes);
+      }).catch(error => {
+        console.error('Error searching notes:', error);
+        alert('Failed to search notes. Please try again.');
+      });
+    } else {
+      noteOperations.loadNotes();
+    }
+  });
+
+  // 添加键盘事件监听器
+  searchInput.addEventListener('keydown', function(event) {
+    console.log('Search keydown event triggered:', event.key);
+    if (event.key === 'Enter') {
+      event.preventDefault(); // 阻止默认行为（提交表单）
       const query = searchInput.value.trim();
+      console.log('Search input detected on Enter:', query); // 添加日志以调试
       if (query) {
         noteOperations.searchNotes(query).then(matchingNotes => {
           updateNoteList(matchingNotes);
@@ -380,8 +399,11 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         noteOperations.loadNotes();
       }
-    });
-  }
+    }
+  });
+} else {
+  console.error('Search input not found');
+}
 
   // 登出按钮事件监听器
   if (logoutButton) {
