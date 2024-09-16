@@ -199,7 +199,35 @@ const noteOperations = {
       console.error('删除笔记时出错:', error);
       alert('删除笔记失败。请重试。');
   }
-  }
+  },
+
+  // async searchNotes(query) {
+  //   console.log('searchNotes called with query:', query);
+  //   try {
+  //     const user = auth.currentUser;
+  //     if (!user) {
+  //       console.log('No user logged in, skipping note search');
+  //       return [];
+  //     }
+  //     const idToken = await user.getIdToken();
+  //     const response = await fetch(`${BASE_API_URL}/notes/search?query=${encodeURIComponent(query)}`, {
+  //       headers: {
+  //         'Authorization': `Bearer ${idToken}`
+  //       }
+  //     });
+  //     if (!response.ok) {
+  //       const errorText = await response.text();
+  //       console.error('API error:', errorText);
+  //       throw new Error(`Failed to search notes: ${response.statusText}`);
+  //     }
+  //     const data = await response.json();
+  //     console.log('Search results received:', data);
+  //     return data;
+  //   } catch (error) {
+  //     console.error('Error in searchNotes:', error);
+  //     throw error;
+  //   }
+  // }
 };
 
 // UI 更新函数
@@ -241,21 +269,40 @@ function updateNoteList(notesToDisplay) {
   </li>
 `).join('');
 
-// // 在生成笔记列表后添加这段代码
-// noteList.querySelectorAll('.dropdown-trigger').forEach(trigger => {
-//   trigger.addEventListener('click', function(e) {
-//     e.stopPropagation();
-//     this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';
-//   });
-// });
+  // 在生成笔记列表后添加这段代码
+  noteList.querySelectorAll('.dropdown').forEach(dropdown => {
+    let timeoutId;
 
-// // 点击页面其他地方时关闭下拉菜单
-// document.addEventListener('click', function() {
-//   document.querySelectorAll('.dropdown-content').forEach(content => {
-//     content.style.display = 'none';
-//   });
-// });
+    dropdown.addEventListener('mouseenter', function() {
+      clearTimeout(timeoutId);
+      const dropdownContent = this.querySelector('.dropdown-content');
+      if (dropdownContent) {
+        dropdownContent.style.display = 'block';
+      }
+    });
 
+    dropdown.addEventListener('mouseleave', function() {
+      const dropdownContent = this.querySelector('.dropdown-content');
+      if (dropdownContent) {
+        timeoutId = setTimeout(() => {
+          dropdownContent.style.display = 'none';
+        }, 500); // 延迟 500 毫秒隐藏
+      }
+    });
+
+    const dropdownContent = dropdown.querySelector('.dropdown-content');
+    if (dropdownContent) {
+      dropdownContent.addEventListener('mouseenter', function() {
+        clearTimeout(timeoutId);
+      });
+
+      dropdownContent.addEventListener('mouseleave', function() {
+        timeoutId = setTimeout(() => {
+          this.style.display = 'none';
+        }, 500); // 延迟 500 毫秒隐藏
+      });
+    }
+  });
 
   // 添加删除按钮的事件监听器
   document.querySelectorAll('.delete-note').forEach(button => {
@@ -316,7 +363,17 @@ document.addEventListener('DOMContentLoaded', function() {
   // 搜索输入事件监听器
   if (searchInput) {
     searchInput.addEventListener('input', function() {
-      // 搜索笔记的逻辑
+      const query = searchInput.value.trim();
+      if (query) {
+        noteOperations.searchNotes(query).then(matchingNotes => {
+          updateNoteList(matchingNotes);
+        }).catch(error => {
+          console.error('Error searching notes:', error);
+          alert('Failed to search notes. Please try again.');
+        });
+      } else {
+        noteOperations.loadNotes();
+      }
     });
   }
 
