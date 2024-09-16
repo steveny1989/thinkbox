@@ -113,6 +113,34 @@ const api = {
     }
 },
 
+async searchNotes(query) {
+  console.log('searchNotes called with query:', query);
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('No user logged in, skipping note search');
+      return [];
+    }
+    const idToken = await user.getIdToken();
+    const response = await fetch(`${BASE_API_URL}/notes/search?query=${encodeURIComponent(query)}`, {
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      throw new Error(`Failed to search notes: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log('Search results received:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in searchNotes:', error);
+    throw error;
+  }
+},
+
   async getFeedback(input) {
     const response = await fetch(HF_API_URL, {
       method: 'POST',
