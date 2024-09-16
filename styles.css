@@ -166,20 +166,21 @@ li {
   right: 0;
   top: 100%;
   background-color: #ffffff;
-  min-width: 80px;
+  min-width: 150px; /* 增加最小宽度 */
+  padding: 10px; /* 增加内边距 */
   box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
   z-index: 1;
-  border-radius: 2px;
+  border-radius: 4px; /* 增加圆角 */
   margin-top: 2px;
 }
 
 .dropdown-content a {
   color: #333;
-  padding: 6px 10px;
+  padding: 8px 12px; /* 增加内边距 */
   text-decoration: none;
   display: block;
-  font-size: 10px;
-  text-align: center;
+  font-size: 12px; /* 调整字体大小 */
+  text-align: center; /* 文本居中 */
   transition: background-color 0.2s, color 0.2s;
 }
 
@@ -317,19 +318,20 @@ li {
   right: 0;
   top: 100%;
   background-color: #ffffff;
-  min-width: 80px; /* 减小最小宽度 */
+  min-width: 150px; /* 增加最小宽度 */
+  padding: 10px; /* 增加内边距 */
   box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
   z-index: 1;
-  border-radius: 2px;
+  border-radius: 4px; /* 增加圆角 */
   margin-top: 2px;
 }
 
 .dropdown-content a {
   color: #333;
-  padding: 6px 10px; /* 减小内边距 */
+  padding: 8px 12px; /* 增加内边距 */
   text-decoration: none;
   display: block;
-  font-size: 14px; /* 设置非常小的字体大小 */
+  font-size: 12px; /* 调整字体大小 */
   text-align: center; /* 文本居中 */
   transition: background-color 0.2s, color 0.2s;
 }
