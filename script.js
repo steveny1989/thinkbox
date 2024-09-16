@@ -232,7 +232,7 @@ function updateNoteList(notesToDisplay) {
         <span class="note-timestamp">${formatTimestamp(note.created_at)}</span>
       </div>
       <div class="dropdown">
-        <button class="dropdown-button">...</button>
+        <span class="dropdown-trigger">...</span>
         <div class="dropdown-content">
           <a href="#" class="delete-note" data-note-id="${note.note_id}">Delete</a>
         </div>
@@ -242,8 +242,8 @@ function updateNoteList(notesToDisplay) {
 `).join('');
 
 // 在生成笔记列表后添加这段代码
-noteList.querySelectorAll('.dropdown-button').forEach(button => {
-  button.addEventListener('click', function(e) {
+noteList.querySelectorAll('.dropdown-trigger').forEach(trigger => {
+  trigger.addEventListener('click', function(e) {
     e.stopPropagation();
     this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'block' ? 'none' : 'block';
   });
