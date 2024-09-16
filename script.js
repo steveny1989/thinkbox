@@ -225,12 +225,14 @@ function updateNoteList(notesToDisplay) {
 
   console.log('Updating note list with received notes');
   noteList.innerHTML = notesToDisplay.map(note => `
-    <li>
-      <span>${note.content}</span>
-      <span class="timestamp">${formatTimestamp(note.created_at)}</span>
-      <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
-    </li>
-  `).join('');
+  <li class="note-item">
+    <div class="note-content">
+      <span class="note-text">${note.content}</span>
+      <span class="note-timestamp">${formatTimestamp(note.created_at)}</span>
+    </div>
+    <button class="delete-note" data-note-id="${note.note_id}">Delete</button>
+  </li>
+`).join('');
 
   // 添加删除按钮的事件监听器
   document.querySelectorAll('.delete-note').forEach(button => {
@@ -249,7 +251,7 @@ function formatTimestamp(timestamp) {
 // 事件监听器
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOMContentLoaded event fired');
-  // 获取开是元素
+  // 获取元素
   const noteInput = document.getElementById('noteInput');
   const addNoteButton = document.getElementById('addNoteButton');
   const searchInput = document.getElementById('searchInput');
