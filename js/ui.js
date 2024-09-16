@@ -1,6 +1,7 @@
 // 从 firebase.js 导入 Firebase 认证实例
 import { auth, onAuthStateChanged } from './firebase.js';
 import noteOperations from './noteOperations.js';
+import { updateNoteList } from './ui.js';
 
 // 更新笔记列表的函数
 export function updateNoteList(notesToDisplay) {
