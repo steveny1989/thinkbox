@@ -141,20 +141,63 @@ async searchNotes(query) {
   }
 },
 
-  async getFeedback(input) {
-    const response = await fetch(HF_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${HF_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ inputs: input })
-    });
-    if (!response.ok) throw new Error('Failed to get feedback');
-    const data = await response.json();
-    return data[0]?.generated_text || 'No feedback available';
+async generateFeedback(noteId, content) {
+  console.log('API generateFeedback called with:', noteId, content);
+  const user = auth.currentUser;
+  if (!user) {
+    console.error('No user logged in');
+    throw new Error('No user logged in');
   }
+  try {
+    const idToken = await user.getIdToken();
+    const response = await fetch(`${BASE_API_URL}/notes/feedback`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`
+      },
+      body: JSON.stringify({ noteId, content })
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      throw new Error(`Failed to generate feedback: ${response.statusText}. ${errorText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error in generateFeedback:', error);
+    throw error;
+  }
+},
+
+// 获取反馈
+async getFeedback(noteId) {
+  console.log('API getFeedback called with noteId:', noteId);
+  const user = auth.currentUser;
+  if (!user) {
+    console.error('No user logged in');
+    throw new Error('No user logged in');
+  }
+  try {
+    const idToken = await user.getIdToken();
+    const response = await fetch(`${BASE_API_URL}/notes/feedback/${noteId}`, {
+      headers: {
+        'Authorization': `Bearer ${idToken}`
+      }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error:', errorText);
+      throw new Error(`Failed to get feedback: ${response.statusText}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error in getFeedback:', error);
+    throw error;
+  }
+}
 };
+
 
 // 笔记操作函数
 const noteOperations = {
@@ -180,20 +223,125 @@ const noteOperations = {
     }
   },
 
-  async addNote(text) {
-    console.log('addNote called with text:', text);
+  async addNoteWithFeedback(text) {
+    console.log('addNoteWithFeedback called with text:', text);
     try {
       const newNote = await api.addNote({ content: text });
       console.log('New note added:', newNote);
-      
+
       // 将新笔记添加到本地 notes 数组的开头
       notes.unshift(newNote);
       updateNoteList(notes); // 更新 UI
-      
+
+      // 异步生成反馈
+      noteOperations.generateFeedbackForNote(newNote.note_id, text);
+
       return newNote;
     } catch (error) {
-      console.error('Error adding note:', error);
+      console.error('Error adding note with feedback:', error);
       alert('Failed to add note. Please try again.');
+    }
+  },
+
+  // 异步生成反馈的函数
+  async generateFeedbackForNote(noteId, content) {
+    try {
+      const feedbackResponse = await api.generateFeedback(noteId, content);
+      console.log('Feedback generated:', feedbackResponse);
+
+      // 更新 UI 显示反馈
+      document.getElementById('feedbackOutput').textContent = feedbackResponse.feedback_text;
+    } catch (error) {
+      console.error('Error generating feedback:', error);
+      // 这里可以选择显示一个默认的反馈信息，或者不做任何处理
+      document.getElementById('feedbackOutput').textContent = 'Failed to generate feedback.';
+    }
+  },
+
+  // 创建新笔记
+  async addNote(note) {
+    console.log('API addNote called with:', note);
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('No user logged in');
+      throw new Error('No user logged in');
+    }
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch(`${BASE_API_URL}/notes`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify(note)
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error:', errorText);
+        throw new Error(`Failed to add note: ${response.statusText}. ${errorText}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error in addNote:', error);
+      throw error;
+    }
+  },
+
+  // 生成反馈
+  async generateFeedback(noteId, content) {
+    console.log('API generateFeedback called with noteId:', noteId);
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('No user logged in');
+      throw new Error('No user logged in');
+    }
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch(`${BASE_API_URL}/notes/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ noteId, content })
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error:', errorText);
+        throw new Error(`Failed to generate feedback: ${response.statusText}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error in generateFeedback:', error);
+      throw error;
+    }
+  },
+
+  // 获取反馈
+  async getFeedback(noteId) {
+    console.log('API getFeedback called with noteId:', noteId);
+    const user = auth.currentUser;
+    if (!user) {
+      console.error('No user logged in');
+      throw new Error('No user logged in');
+    }
+    try {
+      const idToken = await user.getIdToken();
+      const response = await fetch(`${BASE_API_URL}/notes/feedback/${noteId}`, {
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API error:', errorText);
+        throw new Error(`Failed to get feedback: ${response.statusText}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error in getFeedback:', error);
+      throw error;
     }
   },
 
