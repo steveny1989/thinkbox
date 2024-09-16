@@ -148,24 +148,25 @@ li {
 
 .dropdown {
   position: relative;
-  display: flex;
-  align-items: center;
+  display: inline-block;
 }
 
 .dropdown-button {
   background: none;
+  color: #666;
   border: none;
-  font-size: 20px; /* 调整大小以适应您的需求 */
-  line-height: 1;
+  font-size: 14px; /* 调整字体大小 */
   cursor: pointer;
+  display: inline;
   padding: 0;
   margin: 0;
-  color: #666; /* 设置一个适合您设计的颜色 */
-  transition: color 0.3s;
+  line-height: 1;
+  vertical-align: middle;
 }
 
-.dropdown-button:hover {
-  color: #333; /* 悬停时的颜色变化 */
+.dropdown-button::after {
+  content: '...'; /* 使用伪元素设置内容 */
+  font-size: 10px; /* 调整字体大小 */
 }
 
 .dropdown-content {
